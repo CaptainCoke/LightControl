@@ -6,6 +6,8 @@
 #include <QBoxLayout>
 #include "LightBulbWidget.h"
 #include "LightBulb.h"
+#include "Sensor.h"
+#include "SensorWidget.h"
 #include "GatewayAccess.h"
 
 LightControl::LightControl(QWidget *parent)
@@ -13,7 +15,8 @@ LightControl::LightControl(QWidget *parent)
 , m_pclUI(std::make_unique<Ui::LightControl>())
 {
     m_pclUI->setupUi(this);
-    m_pclUI->centralWidget->setLayout( new QVBoxLayout() );
+    m_pclUI->lightsWidget->setLayout( new QVBoxLayout() );
+    m_pclUI->sensorsWidget->setLayout( new QVBoxLayout() );
     connect( &GatewayAccess::instance(), &GatewayAccess::networkInfo, [this](const QString& strMessage){
         m_pclUI->statusBar->showMessage(strMessage);
     } );
@@ -30,27 +33,42 @@ void LightControl::updateLights()
     GatewayAccess::instance().get( "lights", [this](const QJsonObject& rclObject){ updateLightWidgets(rclObject); } );
 }
 
-void LightControl::updateLightWidgets(const QJsonObject& mapLights)
+void LightControl::updateSensors()
 {
-    for ( auto it_light = mapLights.constBegin(); it_light != mapLights.constEnd(); ++it_light )
+    GatewayAccess::instance().get( "sensors", [this](const QJsonObject& rclObject){ updateSensorWidgets(rclObject); } );
+}
+
+template<class NodeFactory,class WidgetFactory>
+void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout)
+{
+    for ( auto it_node = mapNodeData.constBegin(); it_node != mapNodeData.constEnd(); ++it_node )
     {
-        QJsonObject cl_light = it_light.value().toObject();
-        std::shared_ptr<LightBulb> pcl_light = LightBulb::get(it_light.key());
-        if ( pcl_light )
-            pcl_light->setLightData( cl_light );
+        QJsonObject cl_node = it_node.value().toObject();
+        auto pcl_node = NodeFactory::get(it_node.key());
+        if ( pcl_node )
+            pcl_node->setNodeData( cl_node );
         else
-            pcl_light = LightBulb::create( it_light.key(), cl_light );
-        auto it_widget = m_mapLightWidgets.find( it_light.key() );
-        if ( it_widget == m_mapLightWidgets.end() )
+            pcl_node = NodeFactory::create( it_node.key(), cl_node );
+        auto it_widget = m_mapNodeWidgets.find( pcl_node->uniqueId() );
+        if ( it_widget == m_mapNodeWidgets.end() )
         {
-            QLayout* pcl_layout = m_pclUI->centralWidget->layout();
-            LightBulbWidget* pcl_widget = LightBulbWidget::createWidget(pcl_light);
-            pcl_layout->addWidget(pcl_widget);
-            m_mapLightWidgets[it_light.key()] = pcl_widget;
+            DeviceNodeWidget* pcl_widget = WidgetFactory::createWidget(pcl_node);
+            pclLayout->addWidget(pcl_widget);
+            m_mapNodeWidgets[pcl_node->uniqueId()] = pcl_widget;
         }
         else
         {
             it_widget->second->update();
         }
     }
+}
+
+void LightControl::updateLightWidgets(const QJsonObject& mapLights)
+{
+    updateWidget<LightBulb,LightBulbWidget>(mapLights,m_pclUI->lightsWidget->layout());
+}
+
+void LightControl::updateSensorWidgets(const QJsonObject& mapSensors)
+{
+    updateWidget<Sensor,SensorWidget>(mapSensors,m_pclUI->sensorsWidget->layout());
 }

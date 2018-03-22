@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
     LightControl w;
     w.show();
     w.updateLights();
+    w.updateSensors();
 
     return a.exec();
 }

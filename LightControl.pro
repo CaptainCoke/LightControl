@@ -33,7 +33,11 @@ SOURCES += \
     RGBLightBulbWidget.cpp \
     RGBLightBulb.cpp \
     CTLightBulb.cpp \
-    CTLightBulbWidget.cpp
+    CTLightBulbWidget.cpp \
+    Sensor.cpp \
+    DeviceNode.cpp \
+    DeviceNodeWidget.cpp \
+    SensorWidget.cpp
 
 HEADERS += \
         LightControl.h \
@@ -43,8 +47,12 @@ HEADERS += \
     RGBLightBulbWidget.h \
     RGBLightBulb.h \
     CTLightBulb.h \
-    CTLightBulbWidget.h
+    CTLightBulbWidget.h \
+    Sensor.h \
+    DeviceNode.h \
+    DeviceNodeWidget.h \
+    SensorWidget.h
 
 FORMS += \
         LightControl.ui \
-    LightBulbWidget.ui
+    DeviceNodeWidget.ui

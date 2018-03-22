@@ -6,13 +6,13 @@
 
 void RGBLightBulbWidget::setLightHue()
 {
-    auto pcl_light = getLight<RGBLightBulb>();
+    auto pcl_light = getNode<RGBLightBulb>();
     pcl_light->setHue(m_pclHueSlider->value());
 }
 
 void RGBLightBulbWidget::setLightSaturation()
 {
-    auto pcl_light = getLight<RGBLightBulb>();
+    auto pcl_light = getNode<RGBLightBulb>();
     pcl_light->setSaturation(static_cast<uint8_t>(m_pclSaturationSlider->value()));
 }
 
@@ -47,7 +47,7 @@ void RGBLightBulbWidget::createGui()
 void RGBLightBulbWidget::updateState()
 {
     LightBulbWidget::updateState();
-    auto pcl_light = getLight<RGBLightBulb>();
+    auto pcl_light = getNode<RGBLightBulb>();
     m_pclSaturationSlider->setValue( pcl_light->saturation() );
     m_pclHueSlider->setValue( pcl_light->hue() );
 }

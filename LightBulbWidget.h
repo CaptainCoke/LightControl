@@ -1,41 +1,31 @@
 #ifndef LIGHTBULBWIDGET_H
 #define LIGHTBULBWIDGET_H
 
-#include <memory>
-#include <QWidget>
+#include "DeviceNodeWidget.h"
 
-namespace Ui {
-class LightBulbWidget;
-}
-
+class QSlider;
+class QCheckBox;
 class LightBulb;
 
-class LightBulbWidget : public QWidget
+class LightBulbWidget : public DeviceNodeWidget
 {
     Q_OBJECT
-
 public:
     ~LightBulbWidget() override;
     static LightBulbWidget* createWidget( const std::shared_ptr<LightBulb>& pclLight );
-
-public slots:
-    void update();
-    virtual void updateState();
 
 protected slots:
     void setLightBrightness();
 
 protected:
-    virtual void createGui();
-    void addControl( const QString& strName, QLayout* pclLayout );
-    void addControl( const QString& strName, QWidget* pclWidget );
+    void createGui() override;
+    void updateState() override;
 
-    template<class LightType = LightBulb>
-    std::shared_ptr<LightType> getLight() { return std::dynamic_pointer_cast<LightType>(m_pclLight.lock()); }
 private:
     explicit LightBulbWidget( const std::shared_ptr<LightBulb>& pclLight, QWidget *parent = nullptr );
-    std::unique_ptr<Ui::LightBulbWidget> m_pclUI;
-    std::weak_ptr<LightBulb> m_pclLight;
+
+    QCheckBox *m_pclOnCheck;
+    QSlider   *m_pclBrightnessSlider;
 };
 
 #endif // LIGHTBULBWIDGET_H

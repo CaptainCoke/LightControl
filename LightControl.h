@@ -8,7 +8,7 @@ namespace Ui {
 class LightControl;
 }
 
-class LightBulbWidget;
+class DeviceNodeWidget;
 
 class LightControl : public QMainWindow
 {
@@ -20,12 +20,16 @@ public:
 
 public slots:
     void updateLights();
+    void updateSensors();
 
 private:
     void updateLightWidgets( const QJsonObject& mapLights );
+    void updateSensorWidgets( const QJsonObject& mapSensors );
+    template<class NodeFactory,class WidgetFactory>
+    void updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout);
 
     std::unique_ptr<Ui::LightControl> m_pclUI;
-    std::map<QString,LightBulbWidget*> m_mapLightWidgets;
+    std::map<QString,DeviceNodeWidget*> m_mapNodeWidgets;
 };
 
 #endif // LIGHTCONTROL_H

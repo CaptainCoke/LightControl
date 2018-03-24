@@ -43,8 +43,7 @@ int main(int argc, char *argv[])
 
     LightControl w;
     w.show();
-    w.updateLights();
-    w.updateSensors();
+    w.updateFullState();
 
     return a.exec();
 }

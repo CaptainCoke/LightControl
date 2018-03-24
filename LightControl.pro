@@ -38,7 +38,9 @@ SOURCES += \
     Nodes/CTLightBulb.cpp \
     Nodes/Sensor.cpp \
     Nodes/DeviceNode.cpp \
-    Nodes/RemoteControl.cpp
+    Nodes/RemoteControl.cpp \
+    Nodes/Node.cpp \
+    Nodes/LightGroup.cpp
 
 HEADERS += \
         LightControl.h \
@@ -54,7 +56,9 @@ HEADERS += \
     Nodes/CTLightBulb.h \
     Nodes/Sensor.h \
     Nodes/DeviceNode.h \
-    Nodes/RemoteControl.h
+    Nodes/RemoteControl.h \
+    Nodes/Node.h \
+    Nodes/LightGroup.h
 
 FORMS += \
         LightControl.ui \

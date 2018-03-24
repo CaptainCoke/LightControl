@@ -8,6 +8,7 @@
 #include "Widgets/LightBulbWidget.h"
 #include "Nodes/LightBulb.h"
 #include "Nodes/Sensor.h"
+#include "Nodes/LightGroup.h"
 #include "GatewayAccess.h"
 
 LightControl::LightControl(QWidget *parent)
@@ -28,14 +29,9 @@ LightControl::LightControl(QWidget *parent)
 
 LightControl::~LightControl() = default;
 
-void LightControl::updateLights()
+void LightControl::updateFullState()
 {
-    GatewayAccess::instance().get( "lights", [this](const QJsonObject& rclObject){ updateLightWidgets(rclObject); } );
-}
-
-void LightControl::updateSensors()
-{
-    GatewayAccess::instance().get( "sensors", [this](const QJsonObject& rclObject){ updateSensorWidgets(rclObject); } );
+    GatewayAccess::instance().get( "", [this](const QJsonObject& rclObject){ updateFullState(rclObject); } );
 }
 
 void LightControl::removeWidget(QString strUniqueId)
@@ -85,4 +81,24 @@ void LightControl::updateLightWidgets(const QJsonObject& mapLights)
 void LightControl::updateSensorWidgets(const QJsonObject& mapSensors)
 {
     updateWidget<Sensor,SensorWidget>(mapSensors,m_pclUI->sensorsWidget->layout());
+}
+
+void LightControl::updateGroups(const QJsonObject& mapGroups)
+{
+    for ( auto it_node = mapGroups.constBegin(); it_node != mapGroups.constEnd(); ++it_node )
+    {
+        QJsonObject cl_node = it_node.value().toObject();
+        auto pcl_node = LightGroup::get(it_node.key());
+        if ( pcl_node )
+            pcl_node->setNodeData( cl_node );
+        else
+            pcl_node = LightGroup::create( it_node.key(), cl_node );
+    }
+}
+
+void LightControl::updateFullState(const QJsonObject& mapState)
+{
+    updateLightWidgets( mapState.value("lights").toObject() );
+    updateSensorWidgets( mapState.value("sensors").toObject() );
+    updateGroups( mapState.value("groups").toObject() );
 }

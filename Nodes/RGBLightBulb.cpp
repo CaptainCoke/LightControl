@@ -84,6 +84,7 @@ bool RGBLightBulb::setStateData(const QJsonObject &rclObject)
     {
         double Y = static_cast<double>(brightness())/255.0;
         auto [h,s,v] = YxyToHSV({Y,arr_xy[0].toDouble(),arr_xy[1].toDouble()});
+        (void)v;
         b_changed = b_changed || s != m_uiSaturation || h != m_iHue;
         m_uiSaturation = static_cast<uint8_t>(s);
         m_iHue         = h;
@@ -94,6 +95,7 @@ bool RGBLightBulb::setStateData(const QJsonObject &rclObject)
 void RGBLightBulb::setColor(float fTransitionTimeS)
 {
     auto [Y,x,y] = HSVToYxy( {hue(), saturation(), brightness()} );
+    (void)Y;
     QJsonArray xy = {x,y};
     QJsonObject cl_object{ {"xy", xy } };
     changeState(std::move(cl_object),fTransitionTimeS);

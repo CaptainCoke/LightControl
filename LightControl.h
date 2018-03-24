@@ -19,15 +19,16 @@ public:
     ~LightControl();
 
 public slots:
-    void updateLights();
-    void updateSensors();
+    void updateFullState();
 
 protected slots:
     void removeWidget(QString);
 
 private:
+    void updateFullState( const QJsonObject& mapState );
     void updateLightWidgets( const QJsonObject& mapLights );
     void updateSensorWidgets( const QJsonObject& mapSensors );
+    void updateGroups( const QJsonObject& mapGroups );
     template<class NodeFactory,class WidgetFactory>
     void updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout);
 

@@ -3,13 +3,6 @@
 #include <QJsonDocument>
 #include "GatewayAccess.h"
 
-DeviceNode::DeviceNode(const QString& strId)
-: m_strId(strId)
-{
-    m_clStatePollingTimer.setInterval( 100 );
-    connect( &m_clStatePollingTimer, &QTimer::timeout, this, &DeviceNode::refreshNode );
-}
-
 bool DeviceNode::setReachable(bool bReachable)
 {
     bool b_changed = m_bReachable != bReachable;
@@ -21,12 +14,11 @@ DeviceNode::~DeviceNode() = default;
 
 void DeviceNode::setNodeData(const QJsonObject &rclObject)
 {
-    m_strName         = rclObject.value("name").toString();
+    Node::setNodeData(rclObject);
     m_strManufacturer = rclObject.value("manufacturername").toString();
     m_strModelID      = rclObject.value("modelid").toString();
     m_strSWVersion    = rclObject.value("swversion").toString();
-    m_strEtag         = rclObject.value("etag").toString();
-    m_clStatePollingTimer.start();
+    refreshPeriodically(100);
 }
 
 void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
@@ -37,14 +29,4 @@ void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
     }
     GatewayAccess::instance().put(nodeType()+"s/"+id()+"/state", QJsonDocument(clObject).toJson(), [](const QJsonArray&){});
 
-}
-
-void DeviceNode::refreshNode()
-{
-    GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);}, m_strEtag);
-}
-
-void DeviceNode::deleteNode()
-{
-    GatewayAccess::instance().del(nodeType()+"s/"+id(),[this]{ Q_EMIT nodeDeleted(uniqueId()); });
 }

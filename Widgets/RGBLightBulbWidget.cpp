@@ -2,7 +2,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QBoxLayout>
-#include "RGBLightBulb.h"
+#include "Nodes/RGBLightBulb.h"
 
 void RGBLightBulbWidget::setLightHue()
 {

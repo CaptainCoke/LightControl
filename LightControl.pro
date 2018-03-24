@@ -23,40 +23,39 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += \
         main.cpp \
         LightControl.cpp \
-    LightBulbWidget.cpp \
-    GatewayAccess.cpp \
-    LightBulb.cpp \
-    RGBLightBulbWidget.cpp \
-    RGBLightBulb.cpp \
-    CTLightBulb.cpp \
-    CTLightBulbWidget.cpp \
-    Sensor.cpp \
-    DeviceNode.cpp \
-    DeviceNodeWidget.cpp \
-    SensorWidget.cpp \
-    RemoteControl.cpp \
-    RemoteControlWidget.cpp
+        GatewayAccess.cpp \
+    Widgets/LightBulbWidget.cpp \
+    Widgets/RGBLightBulbWidget.cpp \
+    Widgets/CTLightBulbWidget.cpp \
+    Widgets/DeviceNodeWidget.cpp \
+    Widgets/SensorWidget.cpp \
+    Widgets/RemoteControlWidget.cpp \
+    Nodes/LightBulb.cpp \
+    Nodes/RGBLightBulb.cpp \
+    Nodes/CTLightBulb.cpp \
+    Nodes/Sensor.cpp \
+    Nodes/DeviceNode.cpp \
+    Nodes/RemoteControl.cpp
 
 HEADERS += \
         LightControl.h \
-    LightBulbWidget.h \
-    GatewayAccess.h \
-    LightBulb.h \
-    RGBLightBulbWidget.h \
-    RGBLightBulb.h \
-    CTLightBulb.h \
-    CTLightBulbWidget.h \
-    Sensor.h \
-    DeviceNode.h \
-    DeviceNodeWidget.h \
-    SensorWidget.h \
-    RemoteControl.h \
-    RemoteControlWidget.h
+        GatewayAccess.h \
+    Widgets/LightBulbWidget.h \
+    Widgets/RGBLightBulbWidget.h \
+    Widgets/CTLightBulbWidget.h \
+    Widgets/DeviceNodeWidget.h \
+    Widgets/SensorWidget.h \
+    Widgets/RemoteControlWidget.h \
+    Nodes/LightBulb.h \
+    Nodes/RGBLightBulb.h \
+    Nodes/CTLightBulb.h \
+    Nodes/Sensor.h \
+    Nodes/DeviceNode.h \
+    Nodes/RemoteControl.h
 
 FORMS += \
         LightControl.ui \
-    DeviceNodeWidget.ui
+    Widgets/DeviceNodeWidget.ui

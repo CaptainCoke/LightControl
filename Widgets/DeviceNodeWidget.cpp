@@ -1,7 +1,7 @@
 #include "DeviceNodeWidget.h"
 #include <QMessageBox>
 #include "ui_DeviceNodeWidget.h"
-#include "DeviceNode.h"
+#include "Nodes/DeviceNode.h"
 
 DeviceNodeWidget::DeviceNodeWidget(QWidget *parent)
 : QWidget(parent)

@@ -1,6 +1,6 @@
 #include "RemoteControlWidget.h"
 #include <QLabel>
-#include "RemoteControl.h"
+#include "Nodes/RemoteControl.h"
 
 
 void RemoteControlWidget::createGui()
@@ -46,8 +46,7 @@ static QString secondsToHumanReadableTimeInterval(qint64 iTime)
 void RemoteControlWidget::updateLastUpdated()
 {
     auto pcl_remote = getNode<RemoteControl>();
-    qint64 i_seconds_ago = pcl_remote->lastUpdated().secsTo( QDateTime::currentDateTime() );
-    m_pclLastUpdatedLabel->setText( QString( "%1 ago" ).arg(secondsToHumanReadableTimeInterval(i_seconds_ago)) );
+    m_pclLastUpdatedLabel->setText( QString( "%1 ago" ).arg(secondsToHumanReadableTimeInterval(pcl_remote->secondsSinceLastUpdate())) );
 }
 
 void RemoteControlWidget::updateState()

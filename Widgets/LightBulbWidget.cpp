@@ -3,8 +3,8 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include <QCheckBox>
-#include "RGBLightBulb.h"
-#include "CTLightBulb.h"
+#include "Nodes/RGBLightBulb.h"
+#include "Nodes/CTLightBulb.h"
 #include "RGBLightBulbWidget.h"
 #include "CTLightBulbWidget.h"
 

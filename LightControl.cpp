@@ -4,10 +4,10 @@
 #include <QNetworkRequest>
 #include <QMessageBox>
 #include <QBoxLayout>
-#include "LightBulbWidget.h"
-#include "LightBulb.h"
-#include "Sensor.h"
-#include "SensorWidget.h"
+#include "Widgets/SensorWidget.h"
+#include "Widgets/LightBulbWidget.h"
+#include "Nodes/LightBulb.h"
+#include "Nodes/Sensor.h"
 #include "GatewayAccess.h"
 
 LightControl::LightControl(QWidget *parent)

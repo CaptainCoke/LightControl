@@ -2,7 +2,7 @@
 #include <QSlider>
 #include <QLabel>
 #include <QBoxLayout>
-#include "CTLightBulb.h"
+#include "Nodes/CTLightBulb.h"
 
 void CTLightBulbWidget::setLightTemperature()
 {

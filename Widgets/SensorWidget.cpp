@@ -2,9 +2,9 @@
 #include <QProgressBar>
 #include <QLabel>
 #include <QCheckBox>
-#include "Sensor.h"
-#include "RemoteControl.h"
-#include "RemoteControlWidget.h"
+#include "Nodes/Sensor.h"
+#include "Nodes/RemoteControl.h"
+#include "Widgets/RemoteControlWidget.h"
 
 SensorWidget::SensorWidget(const std::shared_ptr<Sensor>& pclSensor, QWidget *parent)
 : DeviceNodeWidget(parent)

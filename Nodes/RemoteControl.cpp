@@ -8,6 +8,11 @@ bool RemoteControl::isRemoteControl(const QJsonObject &rclObject)
     return false;
 }
 
+qint64 RemoteControl::secondsSinceLastUpdate() const
+{
+    return lastUpdated().secsTo( QDateTime::currentDateTime() );
+}
+
 RemoteControl::Button RemoteControl::button() const
 {
     // button codes of TRADFRI remote control
@@ -39,8 +44,28 @@ bool RemoteControl::setStateData(const QJsonObject &rclObject)
     QDateTime t_last_updated = QDateTime::fromString(str_last_updated,Qt::ISODate);
     t_last_updated.setTimeSpec(Qt::UTC);
     int i_button_event = rclObject.value("buttonevent").toInt();
-    b_changed = t_last_updated != m_tLastUpdated || i_button_event != m_iButtonEvent;
+    b_changed = t_last_updated != m_tLastUpdated;
     m_tLastUpdated = t_last_updated;
-    m_iButtonEvent = i_button_event;
+    signalButtonEvent(i_button_event);
     return b_changed;
+}
+
+bool RemoteControl::signalButtonEvent(int iButtonEvent)
+{
+    if ( iButtonEvent == m_iButtonEvent )
+        return false;
+    m_iButtonEvent = iButtonEvent;
+
+    // check time since last updated so we really just report current events
+    if ( secondsSinceLastUpdate() <= 1 )
+    {
+        switch( action() ){
+        case Action::Holding:  emit buttonHeld(button());     break;
+        case Action::Pressed:  emit buttonPressed(button());  break;
+        case Action::Released: emit buttonReleased(button()); break;
+        default: // no signal for any other case...
+            break;
+        }
+    }
+    return true;
 }

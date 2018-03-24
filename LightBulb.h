@@ -17,6 +17,7 @@ public:
 
     static std::shared_ptr<LightBulb> create(const QString& strId, const QJsonObject &rclObject);
     static std::shared_ptr<LightBulb> get(const QString& strId);
+    static void remove(const QString& strId);
 
     QString nodeType() const override;
 

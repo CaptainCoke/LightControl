@@ -22,6 +22,9 @@ public slots:
     void updateLights();
     void updateSensors();
 
+protected slots:
+    void removeWidget(QString);
+
 private:
     void updateLightWidgets( const QJsonObject& mapLights );
     void updateSensorWidgets( const QJsonObject& mapSensors );

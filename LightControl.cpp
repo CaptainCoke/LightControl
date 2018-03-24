@@ -38,6 +38,19 @@ void LightControl::updateSensors()
     GatewayAccess::instance().get( "sensors", [this](const QJsonObject& rclObject){ updateSensorWidgets(rclObject); } );
 }
 
+void LightControl::removeWidget(QString strUniqueId)
+{
+    auto it_widget = m_mapNodeWidgets.find(strUniqueId);
+    if ( it_widget != m_mapNodeWidgets.end() )
+    {
+        QWidget* pcl_widget = it_widget->second;
+        QWidget* pcl_parent_widget = dynamic_cast<QWidget*>(pcl_widget->parent());
+        pcl_parent_widget->layout()->removeWidget(pcl_widget);
+        delete pcl_widget;
+        m_mapNodeWidgets.erase( it_widget );
+    }
+}
+
 template<class NodeFactory,class WidgetFactory>
 void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout)
 {
@@ -60,6 +73,7 @@ void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayo
         {
             it_widget->second->update();
         }
+        connect( pcl_node.get(), &DeviceNode::nodeDeleted, this, &LightControl::removeWidget );
     }
 }
 

@@ -67,6 +67,16 @@ void GatewayAccess::put(const QString &strRequest, const QByteArray& rclData, st
     } );
 }
 
+void GatewayAccess::del(const QString &strRequest, std::function<void()> fnNotifySuccess)
+{
+    QNetworkReply* pcl_reply = m_pclNetwork->deleteResource( createApiRequest(strRequest) );
+    connect( pcl_reply, &QNetworkReply::finished, [this,fnNotifySuccess,pcl_reply](){
+        QJsonDocument cl_doc = getJSONFromReply( pcl_reply );
+        pcl_reply->deleteLater();
+        fnNotifySuccess();
+    } );
+}
+
 QJsonDocument GatewayAccess::getJSONFromReply(QNetworkReply* pclReply)
 {
     // check for error

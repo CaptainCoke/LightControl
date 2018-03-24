@@ -17,10 +17,9 @@ public:
     explicit DeviceNodeWidget(QWidget *parent = nullptr);
     ~DeviceNodeWidget() override;
 
-signals:
-
 public slots:
     void update();
+    void deleteNode();
     virtual void updateState();
 
 protected:

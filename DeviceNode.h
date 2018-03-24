@@ -26,9 +26,11 @@ public:
 
 signals:
     void stateChanged();
+    void nodeDeleted(QString);
 
 public slots:
     void refreshState();
+    void deleteNode();
 
 protected:
     DeviceNode(const QString& strId);

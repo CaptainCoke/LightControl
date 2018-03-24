@@ -31,6 +31,13 @@ std::shared_ptr<Sensor> Sensor::get(const QString& strId)
         return nullptr;
 }
 
+void Sensor::remove(const QString &strId)
+{
+    auto it_sensor = s_mapSensors.find(strId);
+    if ( it_sensor != s_mapSensors.end() )
+        s_mapSensors.erase( it_sensor );
+}
+
 QString Sensor::nodeType() const
 {
     return "sensor";

@@ -21,6 +21,7 @@ public:
 
     void get( const QString& strRequest, std::function<void(const QJsonObject&)> fnParseReply );
     void put( const QString& strRequest, const QByteArray &rclData, std::function<void(const QJsonArray&)> fnParseReply );
+    void del( const QString& strRequest, std::function<void()> fnNotifySuccess );
 
     static GatewayAccess& instance();
 

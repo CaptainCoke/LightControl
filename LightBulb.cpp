@@ -50,6 +50,13 @@ std::shared_ptr<LightBulb> LightBulb::get(const QString& strId)
         return nullptr;
 }
 
+void LightBulb::remove(const QString &strId)
+{
+    auto it_light = s_mapLights.find(strId);
+    if ( it_light != s_mapLights.end() )
+        s_mapLights.erase( it_light );
+}
+
 QString LightBulb::nodeType() const
 {
     return "light";

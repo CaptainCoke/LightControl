@@ -39,3 +39,8 @@ void DeviceNode::refreshState()
 {
     GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);});
 }
+
+void DeviceNode::deleteNode()
+{
+    GatewayAccess::instance().del(nodeType()+"s/"+id(),[this]{ Q_EMIT nodeDeleted(uniqueId()); });
+}

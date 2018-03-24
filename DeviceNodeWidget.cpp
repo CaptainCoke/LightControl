@@ -1,4 +1,5 @@
 #include "DeviceNodeWidget.h"
+#include <QMessageBox>
 #include "ui_DeviceNodeWidget.h"
 #include "DeviceNode.h"
 
@@ -15,6 +16,7 @@ void DeviceNodeWidget::createGui()
     m_pclUI->setupUi(this);
     auto pcl_node = getNode();
     connect( m_pclUI->buttonRefresh, SIGNAL(clicked()), pcl_node.get(), SLOT(updateState()) );
+    connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &DeviceNodeWidget::deleteNode );
 }
 
 
@@ -44,6 +46,14 @@ void DeviceNodeWidget::update()
     m_pclUI->labelModel->setText(        pcl_node->modelID() );
     m_pclUI->labelFirmware->setText(     pcl_node->SWVersion() );
     updateState();
+}
+
+void DeviceNodeWidget::deleteNode()
+{
+    auto pcl_node = getNode();
+    if ( QMessageBox::question( this, "Delete Node", QString("do you really want to delete %1 %2?").arg(pcl_node->nodeType()).arg(pcl_node->id()) ) != QMessageBox::Yes )
+        return;
+    pcl_node->deleteNode();
 }
 
 void DeviceNodeWidget::updateState()

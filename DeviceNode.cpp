@@ -6,6 +6,8 @@
 DeviceNode::DeviceNode(const QString& strId)
 : m_strId(strId)
 {
+    m_clStatePollingTimer.setInterval( 100 );
+    connect( &m_clStatePollingTimer, &QTimer::timeout, this, &DeviceNode::refreshNode );
 }
 
 bool DeviceNode::setReachable(bool bReachable)
@@ -24,6 +26,7 @@ void DeviceNode::setNodeData(const QJsonObject &rclObject)
     m_strModelID      = rclObject.value("modelid").toString();
     m_strSWVersion    = rclObject.value("swversion").toString();
     m_strEtag         = rclObject.value("etag").toString();
+    m_clStatePollingTimer.start();
 }
 
 void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)

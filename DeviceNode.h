@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QObject>
+#include <QTimer>
 
 class DeviceNode : public QObject
 {
@@ -45,7 +46,7 @@ private:
     QString m_strSWVersion;
     QString m_strEtag;
     bool    m_bReachable;
-
+    QTimer  m_clStatePollingTimer;
 };
 
 #endif // DEVICENODE_H

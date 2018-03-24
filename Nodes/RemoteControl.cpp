@@ -50,6 +50,15 @@ bool RemoteControl::setStateData(const QJsonObject &rclObject)
     return b_changed;
 }
 
+bool RemoteControl::setConfigData(const QJsonObject &rclObject)
+{
+    bool b_changed = Sensor::setConfigData(rclObject);
+    QString str_group = rclObject.value("group").toString();
+    b_changed = b_changed || str_group != m_strGroup;
+    m_strGroup = str_group;
+    return b_changed;
+}
+
 bool RemoteControl::signalButtonEvent(int iButtonEvent)
 {
     if ( iButtonEvent == m_iButtonEvent )

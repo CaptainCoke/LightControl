@@ -18,7 +18,7 @@ std::list<std::shared_ptr<LightBulb>> LightGroup::lights() const
 void LightGroup::setNodeData(const QJsonObject &rclObject)
 {
     Node::setNodeData( rclObject );
-    if ( setLights( rclObject.value("ligths").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
+    if ( setLights( rclObject.value("lights").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
     refreshPeriodically(1000);
 }

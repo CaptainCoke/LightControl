@@ -1,7 +1,8 @@
 #include "RemoteControlWidget.h"
 #include <QLabel>
 #include "Nodes/RemoteControl.h"
-
+#include "Nodes/LightGroup.h"
+#include "Nodes/LightBulb.h"
 
 void RemoteControlWidget::createGui()
 {
@@ -9,7 +10,10 @@ void RemoteControlWidget::createGui()
 
     m_pclLastUpdatedLabel = new QLabel("never");
     m_pclButtonLabel = new QLabel("none");
+    m_pclGroupLabel = new QLabel("none");
+    m_pclGroupLabel->setWordWrap(true);
 
+    addControl( "Group", m_pclGroupLabel );
     addControl( "Last updated", m_pclLastUpdatedLabel );
     addControl( "Last button", m_pclButtonLabel );
 
@@ -74,5 +78,23 @@ void RemoteControlWidget::updateState()
     }
     m_pclButtonLabel->setText( str_action + " " + str_button );
     updateLastUpdated();
+    updateLightsFromGroup( pcl_remote->group() );
+}
+
+void RemoteControlWidget::updateLightsFromGroup(const QString &strGroupId)
+{
+    auto pcl_group = LightGroup::get( strGroupId );
+    if ( pcl_group )
+    {
+        QStringList lst_lights;
+        for ( auto pcl_light : pcl_group->lights() )
+            lst_lights << pcl_light->name();
+        if ( lst_lights.empty() )
+            m_pclGroupLabel->setText(QString("%1: No lights").arg(pcl_group->name()));
+        else
+            m_pclGroupLabel->setText(QString("%1: %2").arg(pcl_group->name(),lst_lights.join(", ")));
+    }
+    else
+        m_pclGroupLabel->setText( strGroupId + " (not found)" );
 }
 

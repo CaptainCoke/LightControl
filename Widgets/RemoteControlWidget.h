@@ -19,7 +19,9 @@ protected:
     void createGui() override;
     void updateState() override;
 
-    QLabel *m_pclLastUpdatedLabel, *m_pclButtonLabel;
+    void updateLightsFromGroup( const QString& strGroupId );
+
+    QLabel *m_pclLastUpdatedLabel, *m_pclButtonLabel, *m_pclGroupLabel;
     QTimer *m_pclLastUpdatedTimer;
 };
 

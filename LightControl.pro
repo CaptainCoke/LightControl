@@ -37,7 +37,9 @@ SOURCES += \
     Sensor.cpp \
     DeviceNode.cpp \
     DeviceNodeWidget.cpp \
-    SensorWidget.cpp
+    SensorWidget.cpp \
+    RemoteControl.cpp \
+    RemoteControlWidget.cpp
 
 HEADERS += \
         LightControl.h \
@@ -51,7 +53,9 @@ HEADERS += \
     Sensor.h \
     DeviceNode.h \
     DeviceNodeWidget.h \
-    SensorWidget.h
+    SensorWidget.h \
+    RemoteControl.h \
+    RemoteControlWidget.h
 
 FORMS += \
         LightControl.ui \

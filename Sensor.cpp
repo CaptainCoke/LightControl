@@ -1,5 +1,6 @@
 #include "Sensor.h"
 #include <QJsonObject>
+#include "RemoteControl.h"
 
 std::map<QString,std::shared_ptr<Sensor>> Sensor::s_mapSensors;
 
@@ -8,14 +9,17 @@ Sensor::~Sensor() = default;
 void Sensor::setNodeData(const QJsonObject &rclObject)
 {
     DeviceNode::setNodeData( rclObject );
-    if ( setConfigData( rclObject.value("config").toObject() ) || setStateData(rclObject.value("state").toObject()) )
+    if ( setConfigData( rclObject.value("config").toObject() ) | setStateData(rclObject.value("state").toObject()) )
         emit stateChanged();
 }
 
 std::shared_ptr<Sensor> Sensor::create(const QString& strId, const QJsonObject &rclObject)
 {
     std::shared_ptr<Sensor> pcl_sensor;
-    pcl_sensor.reset( new Sensor(strId) );
+    if ( RemoteControl::isRemoteControl(rclObject) )
+        pcl_sensor.reset( new RemoteControl(strId) );
+    else
+        pcl_sensor.reset( new Sensor(strId) );
     pcl_sensor->setNodeData( rclObject );
     s_mapSensors[strId] = pcl_sensor;
     return pcl_sensor;

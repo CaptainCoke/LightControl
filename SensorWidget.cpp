@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QCheckBox>
 #include "Sensor.h"
+#include "RemoteControl.h"
+#include "RemoteControlWidget.h"
 
 SensorWidget::SensorWidget(const std::shared_ptr<Sensor>& pclSensor, QWidget *parent)
 : DeviceNodeWidget(parent)
@@ -38,7 +40,10 @@ void SensorWidget::updateState()
 SensorWidget* SensorWidget::createWidget(const std::shared_ptr<Sensor>& pclSensor)
 {
     SensorWidget* pcl_widget;
-    pcl_widget = new SensorWidget(pclSensor);
+    if ( std::dynamic_pointer_cast<RemoteControl>(pclSensor) )
+        pcl_widget = new RemoteControlWidget(pclSensor);
+    else
+        pcl_widget = new SensorWidget(pclSensor);
 
     pcl_widget->createGui();
     pcl_widget->updateNode();

@@ -43,6 +43,7 @@ private:
     QString m_strManufacturer;
     QString m_strModelID;
     QString m_strSWVersion;
+    QString m_strEtag;
     bool    m_bReachable;
 
 };

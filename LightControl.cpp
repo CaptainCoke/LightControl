@@ -71,7 +71,7 @@ void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayo
         }
         else
         {
-            it_widget->second->update();
+            it_widget->second->updateNode();
         }
         connect( pcl_node.get(), &DeviceNode::nodeDeleted, this, &LightControl::removeWidget );
     }

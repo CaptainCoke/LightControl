@@ -67,6 +67,6 @@ LightBulbWidget* LightBulbWidget::createWidget(const std::shared_ptr<LightBulb>&
         pcl_widget = new LightBulbWidget(pclLight);
 
     pcl_widget->createGui();
-    pcl_widget->update();
+    pcl_widget->updateNode();
     return pcl_widget;
 }

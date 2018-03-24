@@ -41,6 +41,6 @@ SensorWidget* SensorWidget::createWidget(const std::shared_ptr<Sensor>& pclSenso
     pcl_widget = new SensorWidget(pclSensor);
 
     pcl_widget->createGui();
-    pcl_widget->update();
+    pcl_widget->updateNode();
     return pcl_widget;
 }

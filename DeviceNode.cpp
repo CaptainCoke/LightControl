@@ -23,6 +23,7 @@ void DeviceNode::setNodeData(const QJsonObject &rclObject)
     m_strManufacturer = rclObject.value("manufacturername").toString();
     m_strModelID      = rclObject.value("modelid").toString();
     m_strSWVersion    = rclObject.value("swversion").toString();
+    m_strEtag         = rclObject.value("etag").toString();
 }
 
 void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
@@ -37,7 +38,7 @@ void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
 
 void DeviceNode::refreshNode()
 {
-    GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);});
+    GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);}, m_strEtag);
 }
 
 void DeviceNode::deleteNode()

@@ -18,7 +18,7 @@ public:
     ~DeviceNodeWidget() override;
 
 public slots:
-    void update();
+    void updateNode();
     void deleteNode();
     virtual void updateState();
 

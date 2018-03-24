@@ -38,7 +38,7 @@ void DeviceNodeWidget::setNode(const std::shared_ptr<DeviceNode> &pclNode)
     connect( pclNode.get(), &DeviceNode::stateChanged, this, &DeviceNodeWidget::updateState );
 }
 
-void DeviceNodeWidget::update()
+void DeviceNodeWidget::updateNode()
 {
     auto pcl_node = getNode();
     m_pclUI->groupBox->setTitle(pcl_node->nodeType()+" \""+pcl_node->id()+"\"");

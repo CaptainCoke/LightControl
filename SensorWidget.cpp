@@ -16,7 +16,6 @@ void SensorWidget::createGui()
 {
     DeviceNodeWidget::createGui();
     auto pcl_sensor = getNode<Sensor>();
-    connect( pcl_sensor.get(), SIGNAL(stateChanged()), this, SLOT(updateState()) );
 
     m_pclOnCheck = new QCheckBox("On", this);
     m_pclOnCheck->setEnabled(false);

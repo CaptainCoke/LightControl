@@ -15,7 +15,7 @@ void DeviceNodeWidget::createGui()
 {
     m_pclUI->setupUi(this);
     auto pcl_node = getNode();
-    connect( m_pclUI->buttonRefresh, SIGNAL(clicked()), pcl_node.get(), SLOT(updateState()) );
+    connect( m_pclUI->buttonRefresh, &QPushButton::clicked, pcl_node.get(), &DeviceNode::refreshNode );
     connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &DeviceNodeWidget::deleteNode );
 }
 
@@ -35,6 +35,7 @@ void DeviceNodeWidget::addControl(const QString &strName, QWidget *pclWidget)
 void DeviceNodeWidget::setNode(const std::shared_ptr<DeviceNode> &pclNode)
 {
     m_pclNode = pclNode;
+    connect( pclNode.get(), &DeviceNode::stateChanged, this, &DeviceNodeWidget::updateState );
 }
 
 void DeviceNodeWidget::update()

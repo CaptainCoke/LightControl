@@ -20,10 +20,9 @@ void LightBulbWidget::createGui()
 {
     DeviceNodeWidget::createGui();
     auto pcl_light = getNode<LightBulb>();
-    connect( pcl_light.get(), SIGNAL(stateChanged()), this, SLOT(updateState()) );
 
     m_pclOnCheck = new QCheckBox("On", this);
-    connect( m_pclOnCheck, SIGNAL(toggled(bool)), pcl_light.get(), SLOT(setOn(bool)) );
+    connect( m_pclOnCheck, &QCheckBox::toggled, pcl_light.get(), &LightBulb::setOn );
     addControl( "", m_pclOnCheck );
 
     m_pclBrightnessSlider = new QSlider(Qt::Horizontal,this);
@@ -35,7 +34,7 @@ void LightBulbWidget::createGui()
     pcl_brightness_layout->addWidget( m_pclBrightnessSlider );
     pcl_brightness_layout->addWidget( pcl_brightness_label );
     connect( m_pclBrightnessSlider, &QAbstractSlider::valueChanged, [pcl_brightness_label](int iValue){ pcl_brightness_label->setText( QString::number(iValue) ); } );
-    connect( m_pclBrightnessSlider, SIGNAL(sliderReleased()), this, SLOT(setLightBrightness()) );
+    connect( m_pclBrightnessSlider, &QAbstractSlider::sliderReleased, this, &LightBulbWidget::setLightBrightness );
 
     addControl( "Brightness", pcl_brightness_layout );
 }

@@ -35,7 +35,7 @@ void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
 
 }
 
-void DeviceNode::refreshState()
+void DeviceNode::refreshNode()
 {
     GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);});
 }

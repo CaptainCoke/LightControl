@@ -22,7 +22,7 @@ void CTLightBulbWidget::createGui()
     pcl_temperature_layout->addWidget( m_pclTemperatureSlider );
     pcl_temperature_layout->addWidget( pcl_temperature_label );
     connect( m_pclTemperatureSlider, &QAbstractSlider::valueChanged, [pcl_temperature_label](int iValue){ pcl_temperature_label->setText( QString::number(iValue) ); } );
-    connect( m_pclTemperatureSlider, SIGNAL(sliderReleased()), this, SLOT(setLightTemperature()) );
+    connect( m_pclTemperatureSlider, &QAbstractSlider::sliderReleased, this, &CTLightBulbWidget::setLightTemperature );
 
     addControl( "Temperature", pcl_temperature_layout );
 }

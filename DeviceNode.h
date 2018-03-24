@@ -29,7 +29,7 @@ signals:
     void nodeDeleted(QString);
 
 public slots:
-    void refreshState();
+    void refreshNode();
     void deleteNode();
 
 protected:

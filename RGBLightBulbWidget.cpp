@@ -28,7 +28,7 @@ void RGBLightBulbWidget::createGui()
     pcl_saturation_layout->addWidget( m_pclSaturationSlider );
     pcl_saturation_layout->addWidget( pcl_saturation_label );
     connect( m_pclSaturationSlider, &QAbstractSlider::valueChanged, [pcl_saturation_label](int iValue){ pcl_saturation_label->setText( QString::number(iValue) ); } );
-    connect( m_pclSaturationSlider, SIGNAL(sliderReleased()), this, SLOT(setLightSaturation()) );
+    connect( m_pclSaturationSlider, &QAbstractSlider::sliderReleased, this, &RGBLightBulbWidget::setLightSaturation );
 
     m_pclHueSlider = new QSlider(Qt::Horizontal,this);
     m_pclHueSlider->setRange( 0, 360 );
@@ -38,7 +38,7 @@ void RGBLightBulbWidget::createGui()
     pcl_hue_layout->addWidget( m_pclHueSlider );
     pcl_hue_layout->addWidget( pcl_hue_label );
     connect( m_pclHueSlider, &QAbstractSlider::valueChanged, [pcl_hue_label](int iValue){ pcl_hue_label->setText( QString::number(iValue) ); } );
-    connect( m_pclHueSlider, SIGNAL(sliderReleased()), this, SLOT(setLightHue()) );
+    connect( m_pclHueSlider, &QAbstractSlider::sliderReleased, this, &RGBLightBulbWidget::setLightHue );
 
     addControl( "Hue", pcl_hue_layout );
     addControl( "Saturation", pcl_saturation_layout );

@@ -1,10 +1,9 @@
 #include "DeviceNodeWidget.h"
-#include <QMessageBox>
 #include "ui_DeviceNodeWidget.h"
 #include "Nodes/DeviceNode.h"
 
 DeviceNodeWidget::DeviceNodeWidget(QWidget *parent)
-: QWidget(parent)
+: NodeWidget(parent)
 , m_pclUI(std::make_unique<Ui::DeviceNodeWidget>())
 {
 }
@@ -15,8 +14,8 @@ void DeviceNodeWidget::createGui()
 {
     m_pclUI->setupUi(this);
     auto pcl_node = getNode();
-    connect( m_pclUI->buttonRefresh, &QPushButton::clicked, pcl_node.get(), &DeviceNode::refreshNode );
-    connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &DeviceNodeWidget::deleteNode );
+    connect( m_pclUI->buttonRefresh, &QPushButton::clicked, pcl_node.get(), &Node::refreshNode );
+    connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &NodeWidget::deleteNode );
 }
 
 
@@ -32,15 +31,9 @@ void DeviceNodeWidget::addControl(const QString &strName, QWidget *pclWidget)
     pcl_form->addRow( strName, pclWidget );
 }
 
-void DeviceNodeWidget::setNode(const std::shared_ptr<DeviceNode> &pclNode)
-{
-    m_pclNode = pclNode;
-    connect( pclNode.get(), &DeviceNode::stateChanged, this, &DeviceNodeWidget::updateState );
-}
-
 void DeviceNodeWidget::updateNode()
 {
-    auto pcl_node = getNode();
+    auto pcl_node = getNode<DeviceNode>();
     m_pclUI->groupBox->setTitle(pcl_node->nodeType()+" \""+pcl_node->id()+"\"");
     m_pclUI->labelName->setText(         pcl_node->name() );
     m_pclUI->labelManufacturer->setText( pcl_node->manufacturer() );
@@ -49,16 +42,10 @@ void DeviceNodeWidget::updateNode()
     updateState();
 }
 
-void DeviceNodeWidget::deleteNode()
-{
-    auto pcl_node = getNode();
-    if ( QMessageBox::question( this, "Delete Node", QString("do you really want to delete %1 %2?").arg(pcl_node->nodeType()).arg(pcl_node->id()) ) != QMessageBox::Yes )
-        return;
-    pcl_node->deleteNode();
-}
+
 
 void DeviceNodeWidget::updateState()
 {
-    auto pcl_node = getNode();
+    auto pcl_node = getNode<DeviceNode>();
     m_pclUI->checkReachable->setChecked( pcl_node->isReachable() );
 }

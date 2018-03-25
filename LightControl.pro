@@ -40,7 +40,9 @@ SOURCES += \
     Nodes/DeviceNode.cpp \
     Nodes/RemoteControl.cpp \
     Nodes/Node.cpp \
-    Nodes/LightGroup.cpp
+    Nodes/LightGroup.cpp \
+    Widgets/LightGroupWidget.cpp \
+    Widgets/NodeWidget.cpp
 
 HEADERS += \
         LightControl.h \
@@ -58,8 +60,11 @@ HEADERS += \
     Nodes/DeviceNode.h \
     Nodes/RemoteControl.h \
     Nodes/Node.h \
-    Nodes/LightGroup.h
+    Nodes/LightGroup.h \
+    Widgets/LightGroupWidget.h \
+    Widgets/NodeWidget.h
 
 FORMS += \
         LightControl.ui \
-    Widgets/DeviceNodeWidget.ui
+    Widgets/DeviceNodeWidget.ui \
+    Widgets/LightGroupWidget.ui

@@ -8,7 +8,7 @@ namespace Ui {
 class LightControl;
 }
 
-class DeviceNodeWidget;
+class NodeWidget;
 
 class LightControl : public QMainWindow
 {
@@ -33,7 +33,7 @@ private:
     void updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout);
 
     std::unique_ptr<Ui::LightControl> m_pclUI;
-    std::map<QString,DeviceNodeWidget*> m_mapNodeWidgets;
+    std::map<QString,NodeWidget*> m_mapNodeWidgets;
 };
 
 #endif // LIGHTCONTROL_H

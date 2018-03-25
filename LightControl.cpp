@@ -6,6 +6,7 @@
 #include <QBoxLayout>
 #include "Widgets/SensorWidget.h"
 #include "Widgets/LightBulbWidget.h"
+#include "Widgets/LightGroupWidget.h"
 #include "Nodes/LightBulb.h"
 #include "Nodes/Sensor.h"
 #include "Nodes/LightGroup.h"
@@ -18,6 +19,7 @@ LightControl::LightControl(QWidget *parent)
     m_pclUI->setupUi(this);
     m_pclUI->lightsWidget->setLayout( new QVBoxLayout() );
     m_pclUI->sensorsWidget->setLayout( new QVBoxLayout() );
+    m_pclUI->groupsWidget->setLayout( new QVBoxLayout() );
     connect( &GatewayAccess::instance(), &GatewayAccess::networkInfo, [this](const QString& strMessage){
         m_pclUI->statusBar->showMessage(strMessage);
     } );
@@ -61,13 +63,9 @@ void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayo
         auto it_widget = m_mapNodeWidgets.find( pcl_node->uniqueId() );
         if ( it_widget == m_mapNodeWidgets.end() )
         {
-            DeviceNodeWidget* pcl_widget = WidgetFactory::createWidget(pcl_node);
+            auto* pcl_widget = WidgetFactory::createWidget(pcl_node);
             pclLayout->addWidget(pcl_widget);
             m_mapNodeWidgets[pcl_node->uniqueId()] = pcl_widget;
-        }
-        else
-        {
-            it_widget->second->updateNode();
         }
         connect( pcl_node.get(), &DeviceNode::nodeDeleted, this, &LightControl::removeWidget );
     }
@@ -85,15 +83,7 @@ void LightControl::updateSensorWidgets(const QJsonObject& mapSensors)
 
 void LightControl::updateGroups(const QJsonObject& mapGroups)
 {
-    for ( auto it_node = mapGroups.constBegin(); it_node != mapGroups.constEnd(); ++it_node )
-    {
-        QJsonObject cl_node = it_node.value().toObject();
-        auto pcl_node = LightGroup::get(it_node.key());
-        if ( pcl_node )
-            pcl_node->setNodeData( cl_node );
-        else
-            pcl_node = LightGroup::create( it_node.key(), cl_node );
-    }
+    updateWidget<LightGroup,LightGroupWidget>(mapGroups,m_pclUI->groupsWidget->layout());
 }
 
 void LightControl::updateFullState(const QJsonObject& mapState)
@@ -101,4 +91,9 @@ void LightControl::updateFullState(const QJsonObject& mapState)
     updateGroups( mapState.value("groups").toObject() );
     updateLightWidgets( mapState.value("lights").toObject() );
     updateSensorWidgets( mapState.value("sensors").toObject() );
+    for ( const auto&[key,pcl_widget] : m_mapNodeWidgets )
+    {
+        (void)key;
+        pcl_widget->updateNode();
+    }
 }

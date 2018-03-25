@@ -9,11 +9,14 @@ class LightBulb;
 class LightGroup : public Node
 {
 public:
+    class Scene;
+
     ~LightGroup() override;
 
     bool allOn() const { return m_bAllOn; }
     bool anyOn() const { return m_bAnyOn; }
     std::list<std::shared_ptr<LightBulb>> lights() const;
+    const std::list<std::shared_ptr<Scene>>& scenes() const { return m_lstScenes; }
 
     void setNodeData(const QJsonObject &rclObject) override;
 
@@ -27,11 +30,14 @@ protected:
     using Node::Node;
     bool setStateData(const QJsonObject &rclObject);
     bool setLights(const QJsonArray& rclArray);
+    bool setScenes(const QJsonArray& rclArray);
 
 private:
     QStringList m_lstLightIds;
     bool        m_bAllOn;
     bool        m_bAnyOn;
+
+    std::list<std::shared_ptr<Scene>> m_lstScenes;
 
     static std::map<QString,std::shared_ptr<LightGroup>> s_mapGroups;
 };

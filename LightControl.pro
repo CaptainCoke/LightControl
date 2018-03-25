@@ -42,7 +42,8 @@ SOURCES += \
     Nodes/Node.cpp \
     Nodes/LightGroup.cpp \
     Widgets/LightGroupWidget.cpp \
-    Widgets/NodeWidget.cpp
+    Widgets/NodeWidget.cpp \
+    Nodes/LightGroupScene.cpp
 
 HEADERS += \
         LightControl.h \
@@ -62,7 +63,8 @@ HEADERS += \
     Nodes/Node.h \
     Nodes/LightGroup.h \
     Widgets/LightGroupWidget.h \
-    Widgets/NodeWidget.h
+    Widgets/NodeWidget.h \
+    Nodes/LightGroupScene.h
 
 FORMS += \
         LightControl.ui \

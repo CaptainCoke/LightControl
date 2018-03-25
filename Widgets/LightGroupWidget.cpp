@@ -3,6 +3,7 @@
 #include "ui_LightGroupWidget.h"
 #include "Nodes/LightGroup.h"
 #include "Nodes/LightBulb.h"
+#include "Nodes/LightGroupScene.h"
 
 LightGroupWidget::LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, QWidget *parent)
 : NodeWidget(parent)
@@ -38,10 +39,15 @@ void LightGroupWidget::updateState()
     auto pcl_group = getNode<LightGroup>();
     QSignalBlocker cl_block(m_pclUI->checkLightsOn);
     m_pclUI->checkLightsOn->setCheckState( pcl_group->allOn() ? Qt::Checked : (pcl_group->anyOn() ? Qt::PartiallyChecked : Qt::Unchecked) );
+
     m_pclUI->listLights->clear();
     for ( const auto &pcl_light : pcl_group->lights() )
         if ( pcl_light )
             m_pclUI->listLights->addItem( pcl_light->name() );
+
+    m_pclUI->listScenes->clear();
+    for ( const auto &pcl_scene : pcl_group->scenes() )
+        m_pclUI->listScenes->addItem( pcl_scene->name() );
 }
 
 void LightGroupWidget::setLightOnState(int iState)

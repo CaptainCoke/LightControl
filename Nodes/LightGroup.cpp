@@ -2,6 +2,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include "LightBulb.h"
+#include "LightGroupScene.h"
 
 std::map<QString,std::shared_ptr<LightGroup>> LightGroup::s_mapGroups;
 
@@ -18,7 +19,7 @@ std::list<std::shared_ptr<LightBulb>> LightGroup::lights() const
 void LightGroup::setNodeData(const QJsonObject &rclObject)
 {
     Node::setNodeData( rclObject );
-    if ( setLights( rclObject.value("lights").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
+    if ( setScenes( rclObject.value("scenes").toArray() ) | setLights( rclObject.value("lights").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
     refreshPeriodically(1000);
 }
@@ -69,5 +70,18 @@ bool LightGroup::setLights(const QJsonArray &rclArray)
         lst_ids << val.toString();
     bool b_changed = lst_ids != m_lstLightIds;
     m_lstLightIds = std::move(lst_ids);
+    return b_changed;
+}
+
+bool LightGroup::setScenes(const QJsonArray &rclArray)
+{
+    std::list<std::shared_ptr<Scene>> lst_scenes;
+    for ( const QJsonValue& rcl_scene : rclArray )
+    {
+        QJsonObject cl_scene = rcl_scene.toObject();
+        lst_scenes.emplace_back( std::make_shared<Scene>(id(), cl_scene.value("id").toString(), cl_scene.value("name").toString()) );
+    }
+    bool b_changed = lst_scenes.size() != m_lstScenes.size();
+    m_lstScenes = std::move(lst_scenes);
     return b_changed;
 }

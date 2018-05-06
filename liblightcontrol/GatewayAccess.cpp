@@ -2,7 +2,7 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QApplication>
+#include <QCoreApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -33,7 +33,7 @@ QString GatewayAccess::requestApiKey( const QString& strGatewayAddress )
 
     // wait for reply to finish
     while ( !pcl_reply->isFinished() )
-        QApplication::processEvents();
+        QCoreApplication::processEvents();
     pcl_reply->deleteLater();
 
     // parse result and return api key

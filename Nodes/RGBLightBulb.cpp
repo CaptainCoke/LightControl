@@ -38,12 +38,12 @@ void RGBLightBulb::setColor( LightColor clColor, float fTransitionTimeS)
 
 int RGBLightBulb::hue() const
 {
-    m_clColor.hue( brightness() );
+    return m_clColor.hue( brightness() );
 }
 
 uint8_t RGBLightBulb::saturation() const
 {
-    m_clColor.saturation( brightness() );
+    return m_clColor.saturation( brightness() );
 }
 
 bool RGBLightBulb::isRGBLight(const QJsonObject &rclObject)

@@ -1,8 +1,10 @@
 #include "LightColor.h"
 #include <cmath>
+#include <array>
 #include <QColor>
 #include <array>
 #include <tuple>
+#include "LightTemperature.h"
 
 static std::array<int,3> YxyToHSV(const std::array<double,3>& Yxy)
 {
@@ -68,6 +70,47 @@ static std::array<double,3> HSVToYxy(const std::array<int,3>& HSV)
     return {Y,x,y};
 }
 
+static std::pair<double,double> kelvinToxy( uint16_t uiKelvin )
+{
+    // using cubic spline approximation by Kim et al.
+    // https://en.wikipedia.org/wiki/Planckian_locus#Approximation
+
+    double T_inv  = 1e3/static_cast<double>(uiKelvin);
+    double T2_inv = T_inv*T_inv;
+    double T3_inv = T2_inv*T_inv;
+
+    double x,y;
+    if ( uiKelvin <= 4000 )
+        x = -0.2661239*T3_inv - 0.2343580*T2_inv + 0.8776856*T_inv + 0.179910;
+    else
+        x = -3.0258469*T3_inv + 2.1070379*T2_inv + 0.2226347*T_inv + 0.240390;
+
+    double x2=x*x;
+    double x3=x2*x;
+
+    if ( uiKelvin <= 2222 )
+        y = -1.1063814*x3 - 1.34811020*x2 + 2.18555832*x - 0.20219683;
+    else if ( uiKelvin <= 4000 )
+        y = -0.9549476*x3 - 1.37418593*x2 + 2.09137015*x - 0.16748867;
+    else
+        y = 3.0817580*x3 - 5.87338670*x2 + 3.75112997*x - 0.37001483;
+
+    return {x,y};
+}
+
+static double xyToKelvin( std::pair<double,double> xy )
+{
+    // using  cubic approximation by McCamy
+    // https://en.wikipedia.org/wiki/Color_temperature#Approximation
+    const auto& [x,y] = xy;
+    static const double x_e = 0.3320, y_e = 0.1858;
+    double n = (x-x_e)/(y-y_e);
+    double n2 = n*n;
+    double n3 = n2*n;
+
+    return -449*n3 + 3525*n2 - 6823.3*n + 5520.33;
+}
+
 LightColor::LightColor() = default;
 
 bool LightColor::operator !=( const LightColor& rclOther) const
@@ -90,6 +133,13 @@ LightColor LightColor::fromHSV( int h, uint8_t s, uint8_t v )
     return fromXY( x,y );
 }
 
+LightColor LightColor::fromTemperature(LightTemperature temperature)
+{
+    LightColor cl_col;
+    std::tie( cl_col.m_x, cl_col.m_y ) = kelvinToxy(temperature.kelvin());
+    return cl_col;
+}
+
 uint8_t LightColor::saturation(double Y) const
 {
     return static_cast<uint8_t>(YxyToHSV( {Y,m_x,m_y} )[1]);
@@ -108,4 +158,9 @@ uint8_t LightColor::saturation(uint8_t Y) const
 int LightColor::hue(uint8_t Y) const
 {
     return hue( static_cast<double>(Y)/255.0 );
+}
+
+LightTemperature LightColor::temperature() const
+{
+    return LightTemperature::fromKelvin( static_cast<uint16_t>(xyToKelvin( {m_x,m_y} )) );
 }

@@ -2,7 +2,7 @@
 #include <cmath>
 #include <QJsonObject>
 #include <QJsonArray>
-
+#include "LightBulbState.h"
 
 bool RGBLightBulb::setStateData(const QJsonObject &rclObject)
 {
@@ -34,6 +34,22 @@ void RGBLightBulb::setColor( LightColor clColor, float fTransitionTimeS)
         changeState(std::move(cl_object),fTransitionTimeS);
         emit stateChanged();
     }
+}
+
+void RGBLightBulb::setToState(const LightBulbState &rclState)
+{
+    if ( rclState.hasColor() )
+        setColor( rclState.color() );
+    else if ( rclState.hasTemperature() )
+        setColor( LightColor::fromTemperature( rclState.temperature() ) );
+    LightBulb::setToState(rclState);
+}
+
+LightBulbState RGBLightBulb::getCurrentState() const
+{
+    LightBulbState cl_state = LightBulb::getCurrentState();
+    cl_state.setColor( m_clColor );
+    return cl_state;
 }
 
 int RGBLightBulb::hue() const

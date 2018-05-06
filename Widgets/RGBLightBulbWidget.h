@@ -14,6 +14,7 @@ public:
 protected slots:
     void setLightHue();
     void setLightSaturation();
+    void setLightTemperature();
 
 protected:
     using LightBulbWidget::LightBulbWidget;
@@ -21,6 +22,7 @@ protected:
     void updateState() override;
 
     QSlider *m_pclHueSlider, *m_pclSaturationSlider;
+    QSlider *m_pclTemperatureSlider;
 };
 
 #endif // RGBLIGHTBULBWIDGET_H

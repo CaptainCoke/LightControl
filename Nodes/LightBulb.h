@@ -4,6 +4,8 @@
 #include <memory>
 #include "DeviceNode.h"
 
+class LightBulbState;
+
 class LightBulb : public DeviceNode
 {
     Q_OBJECT
@@ -20,6 +22,9 @@ public:
     static void remove(const QString& strId);
 
     QString nodeType() const override;
+
+    virtual void setToState( const LightBulbState& rclState );
+    virtual LightBulbState getCurrentState() const;
 
 public slots:
     void setOn( bool bOn );

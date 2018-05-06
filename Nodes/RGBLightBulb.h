@@ -15,6 +15,8 @@ public:
     static bool isRGBLight( const QJsonObject &rclObject );
 
     void setColor( LightColor clColor, float fTransitionTimeS = 0.f );
+    void setToState( const LightBulbState& rclState ) override;
+    LightBulbState getCurrentState() const override;
 
     int hue() const;
     uint8_t saturation() const;

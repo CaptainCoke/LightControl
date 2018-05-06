@@ -6,6 +6,11 @@ LightBulbState::LightBulbState( bool bOn )
 {
 }
 
+LightBulbState::LightBulbState(const LightBulbState &) = default;
+LightBulbState::LightBulbState(LightBulbState &&) = default;
+LightBulbState& LightBulbState::operator=(const LightBulbState &) = default;
+LightBulbState& LightBulbState::operator=(LightBulbState &&) = default;
+
 LightBulbState::~LightBulbState() = default;
 
 
@@ -19,9 +24,29 @@ bool LightBulbState::hasBrightness() const
     return m_uiBrightness.has_value();
 }
 
+bool LightBulbState::hasColor() const
+{
+    return m_clColor.has_value();
+}
+
+bool LightBulbState::hasTemperature() const
+{
+    return m_clTemperature.has_value();
+}
+
 uint8_t LightBulbState::brightness() const
 {
     return m_uiBrightness.value();
+}
+
+LightColor LightBulbState::color() const
+{
+    return m_clColor.value();
+}
+
+LightTemperature LightBulbState::temperature() const
+{
+    return m_clTemperature.value();
 }
 
 void LightBulbState::setOn(bool bOn)
@@ -37,12 +62,12 @@ void LightBulbState::setBrightness( uint8_t uiBrightness )
 void LightBulbState::setColor( LightColor clColor )
 {
     m_clColor = clColor;
-    m_iTemperature.reset();
+    m_clTemperature.reset();
 }
 
-void LightBulbState::setTemperature( int iTemperature )
+void LightBulbState::setTemperature( LightTemperature clTemperature )
 {
-    m_iTemperature = iTemperature;
+    m_clTemperature = clTemperature;
     m_clColor.reset();
 }
 
@@ -56,8 +81,8 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
     QJsonValue cl_color_mode = rclSettings.value("colormode");
     if ( !cl_color_mode.isUndefined() )
     {
-        if ( cl_color_mode.toString() == "cv" )
-            cl_state.setTemperature(rclSettings.value("ct").toInt());
+        if ( cl_color_mode.toString() == "ct" )
+            cl_state.setTemperature( LightTemperature::fromMired( rclSettings.value("ct").toInt() ) );
         else if ( cl_color_mode.toString() == "xy" )
             cl_state.setColor( LightColor::fromXY(
                 rclSettings.value("x").toDouble(),

@@ -46,10 +46,12 @@ void LightGroupWidget::updateState()
         if ( pcl_light )
             m_pclUI->listLights->addItem( pcl_light->name() );
 
+    int i_selected_scene = m_pclUI->listScenes->currentRow();
     m_pclUI->listScenes->clear();
     m_pclUI->sceneWidget->hide();
     for ( const auto &pcl_scene : pcl_group->scenes() )
         m_pclUI->listScenes->addItem( pcl_scene->name() );
+    m_pclUI->listScenes->setCurrentRow(i_selected_scene);
 }
 
 void LightGroupWidget::setLightOnState(int iState)

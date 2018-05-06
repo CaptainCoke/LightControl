@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include "LightBulbState.h"
 #include "GatewayAccess.h"
+#include "LightBulb.h"
 
 LightGroupScene::LightGroupScene(const QString& strGroupId, const QString &strId, const QString &strName)
 : m_strGroupId(strGroupId)
@@ -25,7 +26,10 @@ void LightGroupScene::refreshSettings()
 
 void LightGroupScene::apply()
 {
-    //TODO
+    for ( const auto &[str_light, rcl_state] : m_mapLightStates )
+    {
+        LightBulb::get( str_light )->setToState( rcl_state );
+    }
 }
 
 void LightGroupScene::setSceneData(const QJsonObject &rclObject)

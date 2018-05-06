@@ -3,6 +3,7 @@
 #include <QNetworkRequest>
 #include "RGBLightBulb.h"
 #include "CTLightBulb.h"
+#include "LightBulbState.h"
 
 std::map<QString,std::shared_ptr<LightBulb>> LightBulb::s_mapLights;
 
@@ -60,6 +61,20 @@ void LightBulb::remove(const QString &strId)
 QString LightBulb::nodeType() const
 {
     return "light";
+}
+
+void LightBulb::setToState(const LightBulbState &rclState)
+{
+    if ( rclState.hasBrightness() )
+        setBrightness( rclState.brightness() );
+    setOn( rclState.isOn() );
+}
+
+LightBulbState LightBulb::getCurrentState() const
+{
+    LightBulbState cl_state(m_bOn);
+    cl_state.setBrightness(m_uiBrightness);
+    return cl_state;
 }
 
 void LightBulb::setOn( bool bOn )

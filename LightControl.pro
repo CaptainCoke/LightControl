@@ -46,7 +46,8 @@ SOURCES += \
     Nodes/LightGroupScene.cpp \
     Widgets/LightGroupSceneWidget.cpp \
     LightBulbState.cpp \
-    LightColor.cpp
+    LightColor.cpp \
+    LightTemperature.cpp
 
 HEADERS += \
         LightControl.h \
@@ -70,7 +71,8 @@ HEADERS += \
     Nodes/LightGroupScene.h \
     Widgets/LightGroupSceneWidget.h \
     LightBulbState.h \
-    LightColor.h
+    LightColor.h \
+    LightTemperature.h
 
 FORMS += \
         LightControl.ui \

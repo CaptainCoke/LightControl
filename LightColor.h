@@ -2,7 +2,8 @@
 #define LIGHTCOLOR_H
 
 #include <cstdint>
-#include <array>
+
+class LightTemperature;
 
 class LightColor
 {
@@ -12,6 +13,8 @@ public:
     /// hue in [0,359], saturation in [0,255] and V in [0,255]
     static LightColor fromHSV( int h, uint8_t s, uint8_t v );
 
+    static LightColor fromTemperature( LightTemperature temperature );
+
     double x() const { return m_x; }
     double y() const { return m_y; }
 
@@ -20,6 +23,7 @@ public:
     uint8_t saturation( uint8_t Y ) const;
     int hue( double Y ) const;
     int hue( uint8_t Y ) const;
+    LightTemperature temperature() const;
 
     bool operator!=(const LightColor& rclOther) const;
 

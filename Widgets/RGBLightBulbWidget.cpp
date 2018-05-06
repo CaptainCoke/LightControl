@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include "Nodes/RGBLightBulb.h"
+#include "LightTemperature.h"
 
 void RGBLightBulbWidget::setLightHue()
 {
@@ -14,6 +15,12 @@ void RGBLightBulbWidget::setLightSaturation()
 {
     auto pcl_light = getNode<RGBLightBulb>();
     pcl_light->setSaturation(static_cast<uint8_t>(m_pclSaturationSlider->value()));
+}
+
+void RGBLightBulbWidget::setLightTemperature()
+{
+    auto pcl_light = getNode<RGBLightBulb>();
+    pcl_light->setColor( LightColor::fromTemperature( LightTemperature::fromMired( static_cast<uint16_t>(m_pclTemperatureSlider->value())) ));
 }
 
 void RGBLightBulbWidget::createGui()
@@ -42,6 +49,18 @@ void RGBLightBulbWidget::createGui()
 
     addControl( "Hue", pcl_hue_layout );
     addControl( "Saturation", pcl_saturation_layout );
+
+    m_pclTemperatureSlider = new QSlider(Qt::Horizontal,this);
+    m_pclTemperatureSlider->setRange( LightTemperature::fromKelvin(6500).mired(), LightTemperature::fromKelvin(2200).mired() );
+    QLabel*     pcl_temperature_label  = new QLabel("0",this);
+    QBoxLayout* pcl_temperature_layout = new QHBoxLayout;
+    pcl_temperature_label->setMinimumWidth(40);
+    pcl_temperature_layout->addWidget( m_pclTemperatureSlider );
+    pcl_temperature_layout->addWidget( pcl_temperature_label );
+    connect( m_pclTemperatureSlider, &QAbstractSlider::valueChanged, [pcl_temperature_label](int iValue){ pcl_temperature_label->setText( QString::number( LightTemperature::fromMired(iValue).kelvin())+"K" ); } );
+    connect( m_pclTemperatureSlider, &QAbstractSlider::sliderReleased, this, &RGBLightBulbWidget::setLightTemperature );
+
+    addControl( "Temperature", pcl_temperature_layout );
 }
 
 void RGBLightBulbWidget::updateState()
@@ -50,4 +69,5 @@ void RGBLightBulbWidget::updateState()
     auto pcl_light = getNode<RGBLightBulb>();
     m_pclSaturationSlider->setValue( pcl_light->saturation() );
     m_pclHueSlider->setValue( pcl_light->hue() );
+    m_pclTemperatureSlider->setValue( pcl_light->color().temperature().mired() );
 }

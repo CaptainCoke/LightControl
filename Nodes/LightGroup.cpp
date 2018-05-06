@@ -75,11 +75,14 @@ bool LightGroup::setLights(const QJsonArray &rclArray)
 
 bool LightGroup::setScenes(const QJsonArray &rclArray)
 {
-    std::list<std::shared_ptr<Scene>> lst_scenes;
+    std::list<std::shared_ptr<LightGroupScene>> lst_scenes;
     for ( const QJsonValue& rcl_scene : rclArray )
     {
         QJsonObject cl_scene = rcl_scene.toObject();
-        lst_scenes.emplace_back( std::make_shared<Scene>(id(), cl_scene.value("id").toString(), cl_scene.value("name").toString()) );
+        auto pcl_scene = std::make_shared<LightGroupScene>(id(), cl_scene.value("id").toString(), cl_scene.value("name").toString());
+        connect( pcl_scene.get(), &LightGroupScene::settingsRefreshed, this, &LightGroup::stateChanged );
+        pcl_scene->refreshSettings();
+        lst_scenes.emplace_back( std::move(pcl_scene) );
     }
     bool b_changed = lst_scenes.size() != m_lstScenes.size();
     m_lstScenes = std::move(lst_scenes);

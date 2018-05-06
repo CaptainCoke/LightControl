@@ -43,7 +43,10 @@ SOURCES += \
     Nodes/LightGroup.cpp \
     Widgets/LightGroupWidget.cpp \
     Widgets/NodeWidget.cpp \
-    Nodes/LightGroupScene.cpp
+    Nodes/LightGroupScene.cpp \
+    Widgets/LightGroupSceneWidget.cpp \
+    LightBulbState.cpp \
+    LightColor.cpp
 
 HEADERS += \
         LightControl.h \
@@ -64,7 +67,10 @@ HEADERS += \
     Nodes/LightGroup.h \
     Widgets/LightGroupWidget.h \
     Widgets/NodeWidget.h \
-    Nodes/LightGroupScene.h
+    Nodes/LightGroupScene.h \
+    Widgets/LightGroupSceneWidget.h \
+    LightBulbState.h \
+    LightColor.h
 
 FORMS += \
         LightControl.ui \

@@ -14,6 +14,7 @@ LightGroupWidget::LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, 
     connect( m_pclUI->buttonRefresh, &QPushButton::clicked, pclGroup.get(), &Node::refreshNode );
     connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &NodeWidget::deleteNode );
     connect( m_pclUI->checkLightsOn, &QCheckBox::stateChanged, this, &LightGroupWidget::setLightOnState );
+    connect( m_pclUI->listScenes, &QListWidget::currentRowChanged, this, &LightGroupWidget::showSceneInfo );
 }
 
 LightGroupWidget::~LightGroupWidget() = default;
@@ -46,6 +47,7 @@ void LightGroupWidget::updateState()
             m_pclUI->listLights->addItem( pcl_light->name() );
 
     m_pclUI->listScenes->clear();
+    m_pclUI->sceneWidget->hide();
     for ( const auto &pcl_scene : pcl_group->scenes() )
         m_pclUI->listScenes->addItem( pcl_scene->name() );
 }
@@ -65,6 +67,22 @@ void LightGroupWidget::setLightOnState(int iState)
 
     for ( const auto &pcl_light : pcl_group->lights() )
         pcl_light->setOn(b_all_lights_on);
+}
+
+void LightGroupWidget::showSceneInfo(int iSceneIndex)
+{
+    m_pclUI->sceneWidget->hide();
+    if ( iSceneIndex >= 0 )
+    {
+        auto pcl_group = getNode<LightGroup>();
+        auto it_scene = pcl_group->scenes().begin();
+        std::advance(it_scene,iSceneIndex);
+        if ( it_scene != pcl_group->scenes().end() )
+        {
+            m_pclUI->sceneWidget->setScene(*it_scene);
+            m_pclUI->sceneWidget->show();
+        }
+    }
 }
 
 LightGroupWidget* LightGroupWidget::createWidget(const std::shared_ptr<LightGroup>& pclGroup)

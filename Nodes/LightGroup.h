@@ -5,18 +5,17 @@
 #include <memory>
 
 class LightBulb;
+class LightGroupScene;
 
 class LightGroup : public Node
 {
 public:
-    class Scene;
-
     ~LightGroup() override;
 
     bool allOn() const { return m_bAllOn; }
     bool anyOn() const { return m_bAnyOn; }
     std::list<std::shared_ptr<LightBulb>> lights() const;
-    const std::list<std::shared_ptr<Scene>>& scenes() const { return m_lstScenes; }
+    const std::list<std::shared_ptr<LightGroupScene>>& scenes() const { return m_lstScenes; }
 
     void setNodeData(const QJsonObject &rclObject) override;
 
@@ -37,7 +36,7 @@ private:
     bool        m_bAllOn;
     bool        m_bAnyOn;
 
-    std::list<std::shared_ptr<Scene>> m_lstScenes;
+    std::list<std::shared_ptr<LightGroupScene>> m_lstScenes;
 
     static std::map<QString,std::shared_ptr<LightGroup>> s_mapGroups;
 };

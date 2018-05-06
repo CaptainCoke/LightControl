@@ -1,16 +1,42 @@
 #include "LightGroupScene.h"
+#include <QJsonObject>
+#include <QJsonArray>
+#include "LightBulbState.h"
+#include "GatewayAccess.h"
 
-LightGroup::Scene::Scene(const QString& strGroupId, const QString &strId, const QString &strName)
+LightGroupScene::LightGroupScene(const QString& strGroupId, const QString &strId, const QString &strName)
 : m_strGroupId(strGroupId)
 , m_strId(strId)
 , m_strName(strName)
 {
 }
 
-LightGroup::Scene::~Scene() = default;
+const std::map<QString,LightBulbState> &LightGroupScene::getStates()
+{
+    return m_mapLightStates;
+}
 
-void LightGroup::Scene::refreshSettings()
+LightGroupScene::~LightGroupScene() = default;
+
+void LightGroupScene::refreshSettings()
+{
+    GatewayAccess::instance().get("groups/"+m_strGroupId+"/scenes/"+id(), [this](const QJsonObject& rclObject){setSceneData(rclObject);});
+}
+
+void LightGroupScene::apply()
 {
     //TODO
+}
+
+void LightGroupScene::setSceneData(const QJsonObject &rclObject)
+{
+    m_strName = rclObject.value("name").toString();
+    m_mapLightStates.clear();
+    for ( const QJsonValueRef& rcl_light : rclObject.value("lights").toArray() )
+    {
+        QJsonObject cl_light_settings = rcl_light.toObject();
+        m_mapLightStates.emplace( cl_light_settings.value("id").toString(), LightBulbState::fromSceneSettings( cl_light_settings ) );
+    }
+    emit settingsRefreshed();
 }
 

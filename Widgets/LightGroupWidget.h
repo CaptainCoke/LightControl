@@ -24,6 +24,7 @@ public slots:
 
 protected slots:
     void setLightOnState( int iState );
+    void showSceneInfo( int iSceneIndex );
 
 private:
     explicit LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, QWidget *parent = nullptr);

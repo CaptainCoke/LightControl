@@ -2,6 +2,7 @@
 #define RGBLIGHTBULB_H
 
 #include "LightBulb.h"
+#include "LightColor.h"
 
 class RGBLightBulb : public LightBulb
 {
@@ -9,10 +10,14 @@ class RGBLightBulb : public LightBulb
 public:
     ~RGBLightBulb() override = default;
 
-    uint8_t saturation() const { return m_uiSaturation; }
-    int hue() const { return m_iHue; }
+    LightColor color() const { return m_clColor; }
 
     static bool isRGBLight( const QJsonObject &rclObject );
+
+    void setColor( LightColor clColor, float fTransitionTimeS = 0.f );
+
+    int hue() const;
+    uint8_t saturation() const;
 
 public slots:
     void setHue( int iHue, float fTransitionTimeS = 0.f );
@@ -22,10 +27,8 @@ protected:
     using LightBulb::LightBulb;
     bool setStateData(const QJsonObject &rclObject) override;
 
-    void setColor( float fTransitionTimeS = 0.f );
 private:
-    int m_iHue;
-    uint8_t m_uiSaturation;
+    LightColor m_clColor = LightColor::fromXY(0.5,0.5);
 };
 
 #endif // RGBLIGHTBULB_H

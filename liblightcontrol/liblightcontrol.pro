@@ -49,4 +49,5 @@ HEADERS += \
     Nodes/RemoteControl.h \
     Nodes/Node.h \
     Nodes/LightGroup.h \
-    Nodes/LightGroupScene.h
+    Nodes/LightGroupScene.h \
+    Nodes/NodeFactory.h

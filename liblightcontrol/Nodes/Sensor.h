@@ -1,10 +1,10 @@
 #ifndef SENSOR_H
 #define SENSOR_H
 
-#include <memory>
 #include "DeviceNode.h"
+#include "NodeFactory.h"
 
-class Sensor : public DeviceNode
+class Sensor : public DeviceNode, public NodeFactory<Sensor>
 {
 public:
     ~Sensor() override;
@@ -14,11 +14,6 @@ public:
 
     void setNodeData(const QJsonObject &rclObject) override;
 
-    static std::shared_ptr<Sensor> create(const QString& strId, const QJsonObject &rclObject);
-    static std::shared_ptr<Sensor> get(const QString& strId);
-    static void remove(const QString& strId);
-    static const std::map<QString,std::shared_ptr<Sensor>>& getAll();
-
     QString nodeType() const override;
 
 protected:
@@ -26,11 +21,12 @@ protected:
     virtual bool setConfigData(const QJsonObject &rclObject);
     virtual bool setStateData(const QJsonObject &rclObject);
 
+    friend class NodeFactory<Sensor>;
+    static std::shared_ptr<Sensor> createNode(const QString& strId, const QJsonObject &rclObject);
+
 private:
     bool    m_bOn;
     uint8_t m_uiBattery;
-
-    static std::map<QString,std::shared_ptr<Sensor>> s_mapSensors;
 };
 
 #endif // SENSOR_H

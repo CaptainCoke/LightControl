@@ -2,12 +2,12 @@
 #define LIGHTGROUP_H
 
 #include "Node.h"
-#include <memory>
+#include "NodeFactory.h"
 
 class LightBulb;
 class LightGroupScene;
 
-class LightGroup : public Node
+class LightGroup : public Node, public NodeFactory<LightGroup>
 {
 public:
     ~LightGroup() override;
@@ -18,11 +18,6 @@ public:
     const std::map<QString,std::shared_ptr<LightGroupScene>>& scenes() const { return m_mapScenes; }
 
     void setNodeData(const QJsonObject &rclObject) override;
-
-    static std::shared_ptr<LightGroup> create(const QString& strId, const QJsonObject &rclObject);
-    static std::shared_ptr<LightGroup> get(const QString& strId);
-    static void remove(const QString& strId);
-    static const std::map<QString,std::shared_ptr<LightGroup>>& getAll();
 
     QString nodeType() const override;
 
@@ -40,6 +35,9 @@ protected:
 
     void setCurrentScene( const QString& strSceneId );
 
+    friend class NodeFactory<LightGroup>;
+    static std::shared_ptr<LightGroup> createNode(const QString& strId, const QJsonObject &rclObject);
+
 private:
     QStringList m_lstLightIds;
     bool        m_bAllOn;
@@ -47,7 +45,5 @@ private:
     QString     m_strCurrentScene;
 
     std::map<QString,std::shared_ptr<LightGroupScene>> m_mapScenes;
-
-    static std::map<QString,std::shared_ptr<LightGroup>> s_mapGroups;
 };
 #endif // LIGHTGROUP_H

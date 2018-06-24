@@ -1,4 +1,4 @@
-#include <iostream>>
+#include <iostream>
 #include <QCoreApplication>
 #include <QSettings>
 #include "GatewayAccess.h"

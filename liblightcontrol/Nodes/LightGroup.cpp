@@ -5,8 +5,6 @@
 #include "LightBulb.h"
 #include "LightGroupScene.h"
 
-std::map<QString,std::shared_ptr<LightGroup>> LightGroup::s_mapGroups;
-
 LightGroup::~LightGroup() = default;
 
 std::list<std::shared_ptr<LightBulb>> LightGroup::lights() const
@@ -25,33 +23,9 @@ void LightGroup::setNodeData(const QJsonObject &rclObject)
     refreshPeriodically(1000);
 }
 
-std::shared_ptr<LightGroup> LightGroup::create(const QString &strId, const QJsonObject &rclObject)
+std::shared_ptr<LightGroup> LightGroup::createNode(const QString &strId, const QJsonObject &)
 {
-    std::shared_ptr<LightGroup> pcl_group( new LightGroup(strId) );
-    pcl_group->setNodeData( rclObject );
-    s_mapGroups[strId] = pcl_group;
-    return pcl_group;
-}
-
-std::shared_ptr<LightGroup> LightGroup::get(const QString &strId)
-{
-    auto it_group = s_mapGroups.find(strId);
-    if ( it_group != s_mapGroups.end() )
-        return it_group->second;
-    else
-        return nullptr;
-}
-
-void LightGroup::remove(const QString &strId)
-{
-    auto it_group = s_mapGroups.find(strId);
-    if ( it_group != s_mapGroups.end() )
-        s_mapGroups.erase( it_group );
-}
-
-const std::map<QString, std::shared_ptr<LightGroup> > &LightGroup::getAll()
-{
-    return s_mapGroups;
+    return std::shared_ptr<LightGroup>( new LightGroup(strId) );
 }
 
 QString LightGroup::nodeType() const

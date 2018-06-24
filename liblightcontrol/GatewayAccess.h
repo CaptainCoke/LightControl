@@ -30,6 +30,7 @@ public:
 signals:
     void networkInfo(const QString&);
     void networkError(const QString&);
+    void connectionRefused();
 
 private:
     GatewayAccess();

@@ -5,7 +5,6 @@
 #include "CTLightBulb.h"
 #include "LightBulbState.h"
 
-std::map<QString,std::shared_ptr<LightBulb>> LightBulb::s_mapLights;
 
 LightBulb::~LightBulb() = default;
 
@@ -27,7 +26,7 @@ bool LightBulb::setStateData(const QJsonObject &rclObject)
     return b_changed;
 }
 
-std::shared_ptr<LightBulb> LightBulb::create(const QString& strId, const QJsonObject &rclObject)
+std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJsonObject &rclObject)
 {
     std::shared_ptr<LightBulb> pcl_light;
     if ( RGBLightBulb::isRGBLight(rclObject) )
@@ -36,26 +35,7 @@ std::shared_ptr<LightBulb> LightBulb::create(const QString& strId, const QJsonOb
         pcl_light.reset( new CTLightBulb(strId) );
     else
         pcl_light.reset( new LightBulb(strId) );
-    pcl_light->setNodeData( rclObject );
-    s_mapLights[strId] = pcl_light;
     return pcl_light;
-}
-
-
-std::shared_ptr<LightBulb> LightBulb::get(const QString& strId)
-{
-    auto it_light = s_mapLights.find(strId);
-    if ( it_light != s_mapLights.end() )
-        return it_light->second;
-    else
-        return nullptr;
-}
-
-void LightBulb::remove(const QString &strId)
-{
-    auto it_light = s_mapLights.find(strId);
-    if ( it_light != s_mapLights.end() )
-        s_mapLights.erase( it_light );
 }
 
 QString LightBulb::nodeType() const

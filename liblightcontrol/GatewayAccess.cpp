@@ -117,10 +117,13 @@ bool GatewayAccess::networkReplySuccessful( QNetworkReply* pclReply )
             return false;
         }
     case QNetworkReply::OperationCanceledError:
-        emit networkInfo( QString("Network reply to %1 was canceled").arg(str_original_request) );
+        emit networkInfo( QString("Network reply to \"%1\" was canceled").arg(str_original_request) );
         return false;
+    case QNetworkReply::ConnectionRefusedError:
+        emit connectionRefused();
+        [[fallthrough]];
     default:
-        emit networkError( QString("Network reply to %1 received error: %2").arg(str_original_request,pclReply->errorString()) );
+        emit networkError( QString("Network reply to \"%1\" received error: %2").arg(str_original_request,pclReply->errorString()) );
         return false;
     }
 }

@@ -2,8 +2,6 @@
 #include <QJsonObject>
 #include "RemoteControl.h"
 
-std::map<QString,std::shared_ptr<Sensor>> Sensor::s_mapSensors;
-
 Sensor::~Sensor() = default;
 
 void Sensor::setNodeData(const QJsonObject &rclObject)
@@ -13,38 +11,14 @@ void Sensor::setNodeData(const QJsonObject &rclObject)
         emit stateChanged();
 }
 
-std::shared_ptr<Sensor> Sensor::create(const QString& strId, const QJsonObject &rclObject)
+std::shared_ptr<Sensor> Sensor::createNode(const QString& strId, const QJsonObject &rclObject)
 {
     std::shared_ptr<Sensor> pcl_sensor;
     if ( RemoteControl::isRemoteControl(rclObject) )
         pcl_sensor.reset( new RemoteControl(strId) );
     else
         pcl_sensor.reset( new Sensor(strId) );
-    pcl_sensor->setNodeData( rclObject );
-    s_mapSensors[strId] = pcl_sensor;
     return pcl_sensor;
-}
-
-
-std::shared_ptr<Sensor> Sensor::get(const QString& strId)
-{
-    auto it_sensor = s_mapSensors.find(strId);
-    if ( it_sensor != s_mapSensors.end() )
-        return it_sensor->second;
-    else
-        return nullptr;
-}
-
-const std::map<QString,std::shared_ptr<Sensor>>& Sensor::getAll()
-{
-    return s_mapSensors;
-}
-
-void Sensor::remove(const QString &strId)
-{
-    auto it_sensor = s_mapSensors.find(strId);
-    if ( it_sensor != s_mapSensors.end() )
-        s_mapSensors.erase( it_sensor );
 }
 
 QString Sensor::nodeType() const

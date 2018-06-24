@@ -20,16 +20,41 @@ RemoteControlService::RemoteControlService(QObject *parent)
     connect( &GatewayAccess::instance(), &GatewayAccess::networkError, [this](const QString& strMessage){
         qCritical() << "Network error:" << strMessage;
     } );
+
+    connect( &GatewayAccess::instance(), &GatewayAccess::connectionRefused, [this]{
+        static size_t ui_retry_count = 0;
+        if ( started() )
+        {
+            ui_retry_count++;
+            qInfo() << "restarting service ("<<ui_retry_count<<")";
+            stop();
+            QTimer::singleShot( 3000, this, &RemoteControlService::start );
+        }
+    } );
+}
+
+bool RemoteControlService::started() const
+{
+    return m_bStarted;
 }
 
 RemoteControlService::~RemoteControlService() = default;
 
 void RemoteControlService::start()
 {
+    m_bStarted = true;
     GatewayAccess::instance().get( "", [this](const QJsonObject& rclObject){
         updateFullState(rclObject);
         connectRemotesToGroups();
     } );
+}
+
+void RemoteControlService::stop()
+{
+    m_bStarted = false;
+    LightBulb::clearAllNodes();
+    Sensor::clearAllNodes();
+    LightGroup::clearAllNodes();
 }
 
 template<typename T>
@@ -62,9 +87,9 @@ static QStringList updateNodes(const QJsonObject& mapNodeData)
 
 void RemoteControlService::updateFullState(const QJsonObject& mapState)
 {
-    QStringList lst_lights  = updateNodes<LightBulb>( mapState.value("lights").toObject() );
-    QStringList lst_sensors = updateNodes<Sensor>( mapState.value("sensors").toObject() );
-    QStringList lst_groups  = updateNodes<LightGroup>( mapState.value("groups").toObject() );
+    updateNodes<LightBulb>( mapState.value("lights").toObject() );
+    updateNodes<Sensor>( mapState.value("sensors").toObject() );
+    updateNodes<LightGroup>( mapState.value("groups").toObject() );
 }
 
 template<typename T>

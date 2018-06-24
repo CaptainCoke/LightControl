@@ -1,12 +1,12 @@
 #ifndef LIGHTBULB_H
 #define LIGHTBULB_H
 
-#include <memory>
 #include "DeviceNode.h"
+#include "NodeFactory.h"
 
 class LightBulbState;
 
-class LightBulb : public DeviceNode
+class LightBulb : public DeviceNode, public NodeFactory<LightBulb>
 {
     Q_OBJECT
 public:
@@ -16,10 +16,6 @@ public:
     uint8_t brightness() const { return m_uiBrightness; }
 
     void setNodeData(const QJsonObject &rclObject) override;
-
-    static std::shared_ptr<LightBulb> create(const QString& strId, const QJsonObject &rclObject);
-    static std::shared_ptr<LightBulb> get(const QString& strId);
-    static void remove(const QString& strId);
 
     QString nodeType() const override;
 
@@ -34,11 +30,12 @@ protected:
     using DeviceNode::DeviceNode;
     virtual bool setStateData(const QJsonObject &rclObject);
 
+    friend class NodeFactory<LightBulb>;
+    static std::shared_ptr<LightBulb> createNode(const QString& strId, const QJsonObject &rclObject);
+
 private:
     bool    m_bOn;
     uint8_t m_uiBrightness;
-
-    static std::map<QString,std::shared_ptr<LightBulb>> s_mapLights;
 };
 
 #endif // LIGHTBULB_H

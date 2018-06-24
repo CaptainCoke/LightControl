@@ -15,11 +15,13 @@ bool RGBLightBulb::setStateData(const QJsonObject &rclObject)
         double V = static_cast<double>(brightness())/255.0;
         LightColor cl_color = LightColor::fromHSV( H, S, V );
         b_changed = b_changed || cl_color != m_clColor;
+        m_clColor = cl_color;
     }
     else
     {
         LightColor cl_color = LightColor::fromXY( arr_xy[0].toDouble(), arr_xy[1].toDouble() );
         b_changed = b_changed || cl_color != m_clColor;
+        m_clColor = cl_color;
     }
     return b_changed;
 }

@@ -26,6 +26,7 @@ public:
     LightTemperature temperature() const;
 
     bool operator!=(const LightColor& rclOther) const;
+    bool operator==(const LightColor& rclOther) const;
 
 private:
     LightColor();

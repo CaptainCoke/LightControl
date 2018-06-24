@@ -115,7 +115,12 @@ LightColor::LightColor() = default;
 
 bool LightColor::operator !=( const LightColor& rclOther) const
 {
-    return m_x != rclOther.m_x || m_y != rclOther.m_y;
+    return std::abs(m_x - rclOther.m_x) > 1e-4 || std::abs(m_y - rclOther.m_y) >1e-4;
+}
+
+bool LightColor::operator==(const LightColor &rclOther) const
+{
+    return !operator!=(rclOther);
 }
 
 LightColor LightColor::fromXY( double x, double y )

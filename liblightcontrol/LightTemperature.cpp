@@ -7,6 +7,11 @@ bool LightTemperature::operator !=( const LightTemperature& rclOther) const
     return m_mired != rclOther.m_mired;
 }
 
+bool LightTemperature::operator==(const LightTemperature &rclOther) const
+{
+    return !operator!=(rclOther);
+}
+
 LightTemperature LightTemperature::fromMired(uint16_t mired)
 {
     LightTemperature cl_temp;

@@ -11,9 +11,10 @@ class LightGroupScene : public QObject
 {
     Q_OBJECT
 public:
-    LightGroupScene( const QString &strGroupId, const QString& strId, const QString& strName );
+    LightGroupScene( const QString &strGroupId, const QString& strId );
     ~LightGroupScene() override;
 
+    bool updateName( const QString& strName );
     const QString& id() const { return m_strId; }
     const QString& name() const { return m_strName; }
 
@@ -21,11 +22,14 @@ public:
 
     void refreshSettings();
 
+    bool isActive();
+
 public slots:
     void apply();
 
 signals:
     void settingsRefreshed();
+    void sceneApplied();
 
 protected:
     void setSceneData(const QJsonObject &rclObject);

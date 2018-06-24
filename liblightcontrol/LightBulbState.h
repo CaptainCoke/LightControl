@@ -35,6 +35,9 @@ public:
     void setColor( LightColor clColor );
     void setTemperature( LightTemperature clTemperature );
 
+    bool operator==( const LightBulbState& rclOther );
+    bool operator!=( const LightBulbState& rclOther );
+
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );
 
 protected:

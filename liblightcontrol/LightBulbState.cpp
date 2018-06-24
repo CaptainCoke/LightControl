@@ -71,6 +71,36 @@ void LightBulbState::setTemperature( LightTemperature clTemperature )
     m_clColor.reset();
 }
 
+bool LightBulbState::operator==(const LightBulbState &rclOther)
+{
+    if ( isOn() != rclOther.isOn() ) return false;
+    if ( hasBrightness()  && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) ) return false;
+    if ( hasTemperature() )
+    {
+        if ( rclOther.hasTemperature() )
+            return rclOther.temperature() == temperature();
+        else if ( rclOther.hasColor() )
+            return rclOther.color() == LightColor::fromTemperature(temperature());
+        else
+            return false;
+    }
+    if ( hasColor() )
+    {
+        if ( rclOther.hasTemperature() )
+            return LightColor::fromTemperature(rclOther.temperature()) == color();
+        else if ( rclOther.hasColor() )
+            return rclOther.color() == color();
+        else
+            return false;
+    }
+    return true;
+}
+
+bool LightBulbState::operator!=(const LightBulbState &rclOther)
+{
+    return !operator==(rclOther);
+}
+
 LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
 {
     LightBulbState cl_state( rclSettings.value("on").toBool() );

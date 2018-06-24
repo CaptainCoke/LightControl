@@ -14,7 +14,9 @@ LightGroupWidget::LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, 
     connect( m_pclUI->buttonRefresh, &QPushButton::clicked, pclGroup.get(), &Node::refreshNode );
     connect( m_pclUI->buttonDelete, &QPushButton::clicked, this, &NodeWidget::deleteNode );
     connect( m_pclUI->checkLightsOn, &QCheckBox::stateChanged, this, &LightGroupWidget::setLightOnState );
-    connect( m_pclUI->listScenes, &QListWidget::currentRowChanged, this, &LightGroupWidget::showSceneInfo );
+    connect( m_pclUI->listScenes, &QListWidget::currentItemChanged, this, &LightGroupWidget::showSceneInfo );
+    connect( m_pclUI->buttonPreviousScene, &QPushButton::clicked, pclGroup.get(), &LightGroup::setPreviousScene );
+    connect( m_pclUI->buttonNextScene, &QPushButton::clicked, pclGroup.get(), &LightGroup::setNextScene );
 }
 
 LightGroupWidget::~LightGroupWidget() = default;
@@ -49,8 +51,17 @@ void LightGroupWidget::updateState()
     int i_selected_scene = m_pclUI->listScenes->currentRow();
     m_pclUI->listScenes->clear();
     m_pclUI->sceneWidget->hide();
-    for ( const auto &pcl_scene : pcl_group->scenes() )
-        m_pclUI->listScenes->addItem( pcl_scene->name() );
+    auto pcl_current_scene = pcl_group->getCurrentScene();
+    QFont sel_font = m_pclUI->listScenes->font();
+    sel_font.setBold(true);
+    for ( const auto &[str_id,pcl_scene] : pcl_group->scenes() )
+    {
+        auto pcl_item = new QListWidgetItem( pcl_scene->name() );
+        pcl_item->setData( Qt::UserRole, str_id );
+        if ( pcl_scene == pcl_current_scene )
+            pcl_item->setFont( sel_font );
+        m_pclUI->listScenes->addItem( pcl_item );
+    }
     m_pclUI->listScenes->setCurrentRow(i_selected_scene);
 }
 
@@ -71,17 +82,16 @@ void LightGroupWidget::setLightOnState(int iState)
         pcl_light->setOn(b_all_lights_on);
 }
 
-void LightGroupWidget::showSceneInfo(int iSceneIndex)
+void LightGroupWidget::showSceneInfo(QListWidgetItem* pclItem, QListWidgetItem*)
 {
     m_pclUI->sceneWidget->hide();
-    if ( iSceneIndex >= 0 )
+    if ( pclItem )
     {
         auto pcl_group = getNode<LightGroup>();
-        auto it_scene = pcl_group->scenes().begin();
-        std::advance(it_scene,iSceneIndex);
+        auto it_scene = pcl_group->scenes().find(pclItem->data(Qt::UserRole).toString());
         if ( it_scene != pcl_group->scenes().end() )
         {
-            m_pclUI->sceneWidget->setScene(*it_scene);
+            m_pclUI->sceneWidget->setScene(it_scene->second);
             m_pclUI->sceneWidget->show();
         }
     }

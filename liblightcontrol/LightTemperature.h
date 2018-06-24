@@ -2,6 +2,7 @@
 #define LIGHTTEMPERATURE_H
 
 #include <cstdint>
+#include <iostream>
 
 class LightTemperature
 {
@@ -13,6 +14,7 @@ public:
     uint16_t kelvin() const;
 
     bool operator!=(const LightTemperature& rclOther) const;
+    bool operator==(const LightTemperature& rclOther) const;
 
 private:
     LightTemperature();

@@ -1,5 +1,6 @@
 #include "LightBulbState.h"
 #include <QJsonObject>
+#include <QJsonArray>
 
 LightBulbState::LightBulbState( bool bOn )
 : m_bOn(bOn)
@@ -120,4 +121,18 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
     }
 
     return cl_state;
+}
+
+QJsonObject LightBulbState::toJson() const
+{
+    QJsonObject cl_object;
+    cl_object.insert( "on", isOn() );
+    if ( hasBrightness() )
+        cl_object.insert( "bri", brightness() );
+    if ( hasTemperature() )
+        cl_object.insert( "ct", temperature().mired() );
+    if ( hasColor() )
+        cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
+
+    return cl_object;
 }

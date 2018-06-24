@@ -39,6 +39,7 @@ public:
     bool operator!=( const LightBulbState& rclOther );
 
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );
+    QJsonObject toJson() const;
 
 protected:
     bool                            m_bOn;

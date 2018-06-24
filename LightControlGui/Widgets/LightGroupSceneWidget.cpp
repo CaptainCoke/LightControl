@@ -1,6 +1,6 @@
 #include "LightGroupSceneWidget.h"
 #include <Nodes/LightGroupScene.h>
-#include <QFormLayout>
+#include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <LightBulbState.h>
@@ -10,7 +10,7 @@
 LightGroupSceneWidget::LightGroupSceneWidget(QWidget *parent)
 : QGroupBox(parent)
 {
-    setLayout(new QFormLayout);
+    setLayout(new QGridLayout);
 }
 
 LightGroupSceneWidget::~LightGroupSceneWidget() = default;
@@ -21,8 +21,9 @@ void LightGroupSceneWidget::setScene(std::shared_ptr<LightGroupScene> pclScene)
 
     qDeleteAll(findChildren<QWidget*>("", Qt::FindDirectChildrenOnly));
 
-    QFormLayout* pcl_layout = dynamic_cast<QFormLayout*>(layout());
+    QGridLayout* pcl_layout = dynamic_cast<QGridLayout*>(layout());
 
+    int i_row = 0;
     for ( const auto &[str_id, rcl_state] : pclScene->getStates() )
     {
         QStringList lst_text;
@@ -34,10 +35,25 @@ void LightGroupSceneWidget::setScene(std::shared_ptr<LightGroupScene> pclScene)
         if ( rcl_state.hasTemperature() )
             lst_text << QString("temp:%1K").arg( rcl_state.temperature().kelvin() );
 
-        pcl_layout->addRow( LightBulb::get(str_id)->name(), new QLabel(lst_text.join("\n")) );
+        auto pcl_pick_button = new QPushButton("pick");
+        connect( pcl_pick_button, &QPushButton::clicked, [this,str_id,pclScene]{ pclScene->pickSettings(str_id); } );
+
+        pcl_layout->addWidget( new QLabel( LightBulb::get(str_id)->name() ), i_row, 0, 1, 1 );
+        pcl_layout->addWidget( new QLabel(lst_text.join("\n")), i_row, 1, 2, 1 );
+        pcl_layout->addWidget( pcl_pick_button, i_row+1, 0, 1, 1 );
+        i_row+=2;
     }
+    QPushButton* pcl_reset_btn = new QPushButton("reset");
+    connect( pcl_reset_btn, &QPushButton::clicked, pclScene.get(), &LightGroupScene::refreshSettings );
+    pcl_layout->addWidget( pcl_reset_btn, i_row, 0, 1, 1 );
+
+    QPushButton* pcl_save_button = new QPushButton("save");
+    connect( pcl_save_button, &QPushButton::clicked, pclScene.get(), &LightGroupScene::save );
+    pcl_layout->addWidget( pcl_save_button, i_row, 1, 1, 1 );
+
+    i_row++;
+
     QPushButton* pcl_apply_btn = new QPushButton("apply");
     connect( pcl_apply_btn, &QPushButton::clicked, pclScene.get(), &LightGroupScene::apply );
-    pcl_layout->addRow("", pcl_apply_btn);
-
+    pcl_layout->addWidget( pcl_apply_btn, i_row, 0, 1, 2 );
 }

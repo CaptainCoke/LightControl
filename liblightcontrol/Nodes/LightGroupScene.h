@@ -20,12 +20,13 @@ public:
 
     const std::map<QString,LightBulbState>& getStates();
 
-    void refreshSettings();
-
     bool isActive();
 
 public slots:
     void apply();
+    void save();
+    void refreshSettings();
+    void pickSettings( const QString& strLightId );
 
 signals:
     void settingsRefreshed();

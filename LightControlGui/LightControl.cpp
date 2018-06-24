@@ -88,8 +88,8 @@ void LightControl::updateGroups(const QJsonObject& mapGroups)
 
 void LightControl::updateFullState(const QJsonObject& mapState)
 {
-    updateGroups( mapState.value("groups").toObject() );
     updateLightWidgets( mapState.value("lights").toObject() );
+    updateGroups( mapState.value("groups").toObject() );
     updateSensorWidgets( mapState.value("sensors").toObject() );
     for ( const auto&[key,pcl_widget] : m_mapNodeWidgets )
     {

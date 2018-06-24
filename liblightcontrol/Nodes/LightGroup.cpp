@@ -11,7 +11,11 @@ std::list<std::shared_ptr<LightBulb>> LightGroup::lights() const
 {
     std::list<std::shared_ptr<LightBulb>> lst_lights;
     for ( const QString& strId : m_lstLightIds )
-        lst_lights.emplace_back( LightBulb::get(strId) );
+    {
+        auto pcl_light = LightBulb::get(strId);
+        if ( pcl_light )
+            lst_lights.emplace_back( std::move(pcl_light) );
+    }
     return lst_lights;
 }
 
@@ -20,7 +24,7 @@ void LightGroup::setNodeData(const QJsonObject &rclObject)
     Node::setNodeData( rclObject );
     if ( setScenes( rclObject.value("scenes").toArray() ) | setLights( rclObject.value("lights").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
-    refreshPeriodically(1000);
+    refreshPeriodically(5000);
 }
 
 bool LightGroup::anyOn() const
@@ -103,8 +107,27 @@ bool LightGroup::setLights(const QJsonArray &rclArray)
     for ( const QJsonValue& val : rclArray )
         lst_ids << val.toString();
     bool b_changed = lst_ids != m_lstLightIds;
-    m_lstLightIds = std::move(lst_ids);
+    if ( b_changed )
+    {
+        for ( auto pcl_light : lights() )
+            pcl_light->disconnect( this );
+        m_lstLightIds = std::move(lst_ids);
+        for ( auto pcl_light : lights() )
+            connect( pcl_light.get(), &Node::stateChanged, this, &LightGroup::lightChanged );
+    }
     return b_changed;
+}
+
+void LightGroup::lightChanged()
+{
+    for ( const auto & [str_id, pcl_scene] : scenes() )
+    {
+        if ( pcl_scene->isActive() )
+        {
+            setCurrentScene( str_id );
+            return;
+        }
+    }
 }
 
 bool LightGroup::setScenes(const QJsonArray &rclArray)
@@ -114,7 +137,7 @@ bool LightGroup::setScenes(const QJsonArray &rclArray)
     for ( const QJsonValue& rcl_scene : rclArray )
     {
         QJsonObject cl_scene = rcl_scene.toObject();
-        QString str_scene_id = cl_scene.value("id").toString(); ;
+        QString str_scene_id = cl_scene.value("id").toString();
         set_ids.insert(str_scene_id);
         auto it_scene = m_mapScenes.find( str_scene_id );
         std::shared_ptr<LightGroupScene> pcl_scene;

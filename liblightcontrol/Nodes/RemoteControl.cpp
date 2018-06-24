@@ -70,12 +70,15 @@ bool RemoteControl::signalButtonEvent(int iButtonEvent)
     bool b_changed = iButtonEvent == m_iButtonEvent;
     m_iButtonEvent = iButtonEvent;
 
-    switch( action() ){
-    case Action::Holding:  emit buttonHeld(button());     break;
-    case Action::Pressed:  emit buttonPressed(button());  break;
-    case Action::Released: emit buttonReleased(button()); break;
-    default: // no signal for any other case...
-        break;
+    if ( secondsSinceLastUpdate() < 1 )
+    {
+        switch( action() ){
+        case Action::Holding:  emit buttonHeld(button());     break;
+        case Action::Pressed:  emit buttonPressed(button());  break;
+        case Action::Released: emit buttonReleased(button()); break;
+        default: // no signal for any other case...
+            break;
+        }
     }
 
     return b_changed;

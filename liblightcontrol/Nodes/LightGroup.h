@@ -27,6 +27,9 @@ public slots:
     void setNextScene();
     void setPreviousScene();
 
+protected slots:
+    void lightChanged();
+
 protected:
     using Node::Node;
     bool setStateData(const QJsonObject &rclObject);

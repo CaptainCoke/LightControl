@@ -13,6 +13,7 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
     DeviceNode::setNodeData( rclObject );
     if ( setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
+    refreshPeriodically(1000);
 }
 
 bool LightBulb::setStateData(const QJsonObject &rclObject)

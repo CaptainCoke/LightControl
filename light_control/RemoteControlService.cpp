@@ -31,6 +31,10 @@ RemoteControlService::RemoteControlService(QObject *parent)
             QTimer::singleShot( 3000, this, &RemoteControlService::start );
         }
     } );
+
+    m_clStatePollingTimer.setInterval( 3000 );
+    connect( &m_clStatePollingTimer, &QTimer::timeout, this, &RemoteControlService::refreshLightNodes );
+    connect( this, &RemoteControlService::lightsChanged, this, &RemoteControlService::refreshGroupNodes );
 }
 
 bool RemoteControlService::started() const
@@ -46,12 +50,14 @@ void RemoteControlService::start()
     GatewayAccess::instance().get( "", [this](const QJsonObject& rclObject){
         updateFullState(rclObject);
         connectRemotesToGroups();
+        m_clStatePollingTimer.start();
     } );
 }
 
 void RemoteControlService::stop()
 {
     m_bStarted = false;
+    m_clStatePollingTimer.stop();
     LightBulb::clearAllNodes();
     Sensor::clearAllNodes();
     LightGroup::clearAllNodes();
@@ -64,9 +70,9 @@ static QString getTypeName()
 }
 
 template<class NodeFactory>
-static QStringList updateNodes(const QJsonObject& mapNodeData)
+static bool updateNodes(const QJsonObject& mapNodeData)
 {
-    QStringList lst_ids;
+    QStringList lst_new_ids, lst_all_ids;
     for ( auto it_node = mapNodeData.constBegin(); it_node != mapNodeData.constEnd(); ++it_node )
     {
         QJsonObject cl_node = it_node.value().toObject();
@@ -74,16 +80,54 @@ static QStringList updateNodes(const QJsonObject& mapNodeData)
         if ( pcl_node )
             pcl_node->setNodeData( cl_node );
         else
+        {
             pcl_node = NodeFactory::create( it_node.key(), cl_node );
-        lst_ids << pcl_node->id();
+            lst_new_ids << pcl_node->id();
+        }
+        lst_all_ids << pcl_node->id();
     }
 
-    qInfo() << "found" << lst_ids.size() << getTypeName<NodeFactory>();
-    for ( const QString& str_id : lst_ids )
-        qInfo() << "  *" << NodeFactory::get(str_id)->name();
+    if ( !lst_new_ids.isEmpty() )
+    {
+        qInfo() << "added" << lst_new_ids.size() << getTypeName<NodeFactory>();
+        for ( const QString& str_id : lst_new_ids )
+            qInfo() << "  *" << NodeFactory::get(str_id)->name();
+    }
 
-    return lst_ids;
+    // erase all nodes that have been removed...
+    QStringList lst_removed_ids;
+    for ( const auto & rcl_node : NodeFactory::getAll() )
+        if ( !lst_all_ids.contains( rcl_node.first ) )
+            lst_removed_ids << rcl_node.first;
+
+    for ( const QString& str_id : lst_removed_ids )
+        NodeFactory::remove(str_id);
+
+    if ( !lst_removed_ids.isEmpty() )
+    {
+        qInfo() << "removed" << lst_removed_ids.size() << getTypeName<NodeFactory>();
+        for ( const QString& str_id : lst_removed_ids )
+            qInfo() << "  *" << NodeFactory::get(str_id)->name();
+    }
+
+    return !(lst_new_ids.isEmpty() && lst_removed_ids.isEmpty());
 }
+
+void RemoteControlService::refreshLightNodes()
+{
+    GatewayAccess::instance().get( "lights", [this](const QJsonObject& rclObject){
+        if ( updateNodes<LightBulb>( rclObject ) )
+            emit lightsChanged();
+    });
+}
+
+void RemoteControlService::refreshGroupNodes()
+{
+    GatewayAccess::instance().get( "groups", [this](const QJsonObject& rclObject){
+        updateNodes<LightGroup>( rclObject );
+    });
+}
+
 
 void RemoteControlService::updateFullState(const QJsonObject& mapState)
 {
@@ -159,7 +203,7 @@ void switchLightsOnButtonPress(LightGroup& rclGroup, RemoteControl::Button butto
         {
             qDebug() << "reducing brightness of group" << rclGroup.name() << "by 32";
             for ( const auto &pcl_light : rclGroup.lights() )
-                pcl_light->setBrightness(std::max(0,pcl_light->brightness()-32));
+                pcl_light->setBrightness(std::max(1,pcl_light->brightness()-32));
         }
         break;
     }

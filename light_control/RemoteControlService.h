@@ -2,6 +2,7 @@
 #define REMOTECONTROLSERVICE_H
 
 #include <QObject>
+#include <QTimer>
 
 class RemoteControlService : public QObject
 {
@@ -16,9 +17,19 @@ public slots:
     void start();
     void stop();
 
-private:
+signals:
+    void lightsChanged();
+
+protected slots:
+    void refreshLightNodes();
+    void refreshGroupNodes();
+
+protected:
     void connectRemotesToGroups();
     void updateFullState( const QJsonObject& mapState );
+
+private:
+    QTimer m_clStatePollingTimer;
     bool m_bStarted = false;
 };
 

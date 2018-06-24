@@ -55,11 +55,12 @@ void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayo
     for ( auto it_node = mapNodeData.constBegin(); it_node != mapNodeData.constEnd(); ++it_node )
     {
         QJsonObject cl_node = it_node.value().toObject();
-        auto pcl_node = NodeFactory::get(it_node.key());
+        QString str_node_id = it_node.key();
+        auto pcl_node = NodeFactory::get(str_node_id);
         if ( pcl_node )
             pcl_node->setNodeData( cl_node );
         else
-            pcl_node = NodeFactory::create( it_node.key(), cl_node );
+            pcl_node = NodeFactory::create( str_node_id, cl_node );
         auto it_widget = m_mapNodeWidgets.find( pcl_node->uniqueId() );
         if ( it_widget == m_mapNodeWidgets.end() )
         {
@@ -67,7 +68,8 @@ void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayo
             pclLayout->addWidget(pcl_widget);
             m_mapNodeWidgets[pcl_node->uniqueId()] = pcl_widget;
         }
-        connect( pcl_node.get(), &DeviceNode::nodeDeleted, this, &LightControl::removeWidget );
+        connect( pcl_node.get(), &Node::nodeDeleted, this, &LightControl::removeWidget );
+        connect( pcl_node.get(), &Node::nodeDeleted, [str_node_id]{ NodeFactory::remove(str_node_id); } );
     }
 }
 

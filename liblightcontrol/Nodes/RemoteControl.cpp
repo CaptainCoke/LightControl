@@ -61,20 +61,16 @@ bool RemoteControl::setConfigData(const QJsonObject &rclObject)
 
 bool RemoteControl::signalButtonEvent(int iButtonEvent)
 {
-    if ( iButtonEvent == m_iButtonEvent )
-        return false;
+    bool b_changed = iButtonEvent == m_iButtonEvent;
     m_iButtonEvent = iButtonEvent;
 
-    // check time since last updated so we really just report current events
-    if ( secondsSinceLastUpdate() <= 1 )
-    {
-        switch( action() ){
-        case Action::Holding:  emit buttonHeld(button());     break;
-        case Action::Pressed:  emit buttonPressed(button());  break;
-        case Action::Released: emit buttonReleased(button()); break;
-        default: // no signal for any other case...
-            break;
-        }
+    switch( action() ){
+    case Action::Holding:  emit buttonHeld(button());     break;
+    case Action::Pressed:  emit buttonPressed(button());  break;
+    case Action::Released: emit buttonReleased(button()); break;
+    default: // no signal for any other case...
+        break;
     }
-    return true;
+
+    return b_changed;
 }

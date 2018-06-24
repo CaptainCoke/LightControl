@@ -16,7 +16,7 @@ class LightControl : public QMainWindow
 
 public:
     explicit LightControl(QWidget *parent = 0);
-    ~LightControl();
+    ~LightControl() override;
 
 public slots:
     void updateFullState();

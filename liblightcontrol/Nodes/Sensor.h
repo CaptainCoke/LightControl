@@ -17,6 +17,7 @@ public:
     static std::shared_ptr<Sensor> create(const QString& strId, const QJsonObject &rclObject);
     static std::shared_ptr<Sensor> get(const QString& strId);
     static void remove(const QString& strId);
+    static const std::map<QString,std::shared_ptr<Sensor>>& getAll();
 
     QString nodeType() const override;
 

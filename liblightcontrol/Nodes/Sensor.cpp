@@ -35,6 +35,11 @@ std::shared_ptr<Sensor> Sensor::get(const QString& strId)
         return nullptr;
 }
 
+const std::map<QString,std::shared_ptr<Sensor>>& Sensor::getAll()
+{
+    return s_mapSensors;
+}
+
 void Sensor::remove(const QString &strId)
 {
     auto it_sensor = s_mapSensors.find(strId);

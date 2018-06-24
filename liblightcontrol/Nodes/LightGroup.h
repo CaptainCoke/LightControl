@@ -22,6 +22,7 @@ public:
     static std::shared_ptr<LightGroup> create(const QString& strId, const QJsonObject &rclObject);
     static std::shared_ptr<LightGroup> get(const QString& strId);
     static void remove(const QString& strId);
+    static const std::map<QString,std::shared_ptr<LightGroup>>& getAll();
 
     QString nodeType() const override;
 

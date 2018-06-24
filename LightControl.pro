@@ -1,7 +1,9 @@
 TEMPLATE = subdirs
 CONFIG += orderes
 SUBDIRS += \
-	liblightcontrol \
-	LightControlGui
+    liblightcontrol \
+    LightControlGui \
+    light_control
 
 LightControlGui.depends = liblightcontrol
+light_control.depends = liblightcontrol

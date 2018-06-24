@@ -49,6 +49,11 @@ void LightGroup::remove(const QString &strId)
         s_mapGroups.erase( it_group );
 }
 
+const std::map<QString, std::shared_ptr<LightGroup> > &LightGroup::getAll()
+{
+    return s_mapGroups;
+}
+
 QString LightGroup::nodeType() const
 {
     return "group";

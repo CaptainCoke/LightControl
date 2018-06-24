@@ -18,7 +18,6 @@ void DeviceNode::setNodeData(const QJsonObject &rclObject)
     m_strManufacturer = rclObject.value("manufacturername").toString();
     m_strModelID      = rclObject.value("modelid").toString();
     m_strSWVersion    = rclObject.value("swversion").toString();
-    refreshPeriodically(100);
 }
 
 void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)

@@ -12,8 +12,8 @@ class LightGroup : public Node, public NodeFactory<LightGroup>
 public:
     ~LightGroup() override;
 
-    bool allOn() const { return m_bAllOn; }
-    bool anyOn() const { return m_bAnyOn; }
+    bool allOn() const;
+    bool anyOn() const;
     std::list<std::shared_ptr<LightBulb>> lights() const;
     const std::map<QString,std::shared_ptr<LightGroupScene>>& scenes() const { return m_mapScenes; }
 

@@ -23,6 +23,22 @@ void LightGroup::setNodeData(const QJsonObject &rclObject)
     refreshPeriodically(1000);
 }
 
+bool LightGroup::anyOn() const
+{
+    for ( const auto& pcl_light : lights()  )
+        if ( pcl_light->isOn() )
+            return true;
+    return false;
+}
+
+bool LightGroup::allOn() const
+{
+    for ( const auto& pcl_light : lights() )
+        if ( !pcl_light->isOn() )
+            return false;
+    return true;
+}
+
 std::shared_ptr<LightGroup> LightGroup::createNode(const QString &strId, const QJsonObject &)
 {
     return std::shared_ptr<LightGroup>( new LightGroup(strId) );

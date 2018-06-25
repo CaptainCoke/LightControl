@@ -35,11 +35,11 @@ bool LightGroupScene::isActive()
 {
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
-        auto pcl_light = LightBulb::get( str_light );
+         std::shared_ptr<LightBulb const> pcl_light = LightBulb::get( str_light );
         if ( !pcl_light )
             return false;
-        LightBulbState cl_state = pcl_light->getCurrentState();
-        if ( cl_state != rcl_state )
+        const LightBulbState& rcl_current_state = pcl_light->getTargetState();
+        if ( rcl_current_state != rcl_state )
             return false;
     }
     return true;
@@ -47,11 +47,13 @@ bool LightGroupScene::isActive()
 
 void LightGroupScene::apply()
 {
-    for ( const auto &[str_light, rcl_state] : m_mapLightStates )
-    {
-        LightBulb::get( str_light )->setToState( rcl_state );
-    }
-    emit sceneApplied();
+    GatewayAccess::instance().put("groups/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
+        for ( const auto &[str_light, rcl_state] : m_mapLightStates )
+        {
+            LightBulb::get( str_light )->setTargetState( rcl_state );
+        }
+        emit sceneApplied();
+    });
 }
 
 void LightGroupScene::save()
@@ -65,7 +67,7 @@ void LightGroupScene::save()
 
 void LightGroupScene::pickSettings(const QString &strLightId)
 {
-    auto pcl_light = LightBulb::get( strLightId );
+    std::shared_ptr<LightBulb const> pcl_light = LightBulb::get( strLightId );
     if ( !pcl_light )
         return;
 

@@ -5,6 +5,7 @@
 
 class DeviceNode : public Node
 {
+    Q_OBJECT
 public:
     ~DeviceNode() override;
 
@@ -15,8 +16,12 @@ public:
     void setNodeData(const QJsonObject &rclObject) override;
     bool isReachable() const { return m_bReachable; }
 
+signals:
+    void changeStateConfirmed();
+
 protected:
     using Node::Node;
+
     bool setReachable( bool bReachable );
     void changeState( QJsonObject clObject, float fTransitionTimeS = 0.f );
 

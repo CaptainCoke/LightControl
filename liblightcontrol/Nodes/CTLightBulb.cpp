@@ -2,14 +2,19 @@
 #include <QJsonObject>
 #include "LightBulbState.h"
 
+LightTemperature CTLightBulb::temperature() const
+{
+    return getCurrentState().temperature();
+}
+
 bool CTLightBulb::isCTLight(const QJsonObject &rclObject)
 {
     if ( !rclObject.value("hascolor").isBool() || !rclObject.value("hascolor").toBool() )
         return false;
     QJsonObject cl_state = rclObject.value("state").toObject();
-    if ( cl_state.isEmpty() || cl_state.find("ct") == cl_state.end() )
+    if ( cl_state.isEmpty() )
         return false;
-    return true;
+    return LightBulbState::fromSceneSettings(cl_state).hasTemperature();
 }
 
 void CTLightBulb::setNodeData(const QJsonObject &rclObject)
@@ -19,43 +24,14 @@ void CTLightBulb::setNodeData(const QJsonObject &rclObject)
     LightBulb::setNodeData(rclObject);
 }
 
-void CTLightBulb::setToState(const LightBulbState &rclState)
-{
-    if ( rclState.hasTemperature() )
-        setTemperature( rclState.temperature() );
-    else if ( rclState.hasColor() )
-        setTemperature( rclState.color().temperature() );
-    LightBulb::setToState(rclState);
-}
-
 void CTLightBulb::setTemperature(LightTemperature clTemperature, float fTransitionTimeS)
 {
-    if ( clTemperature != m_clTemperature )
-    {
-        m_clTemperature = clTemperature;
-        setMired( clTemperature.mired(), fTransitionTimeS );
-    }
-}
-
-LightBulbState CTLightBulb::getCurrentState() const
-{
-    LightBulbState cl_state = LightBulb::getCurrentState();
-    cl_state.setTemperature( m_clTemperature );
-    return cl_state;
+    getTargetState().setTemperature( std::move(clTemperature) );
+    if ( getTargetState() != getCurrentState() )
+        changeToState( getTargetState(), fTransitionTimeS );
 }
 
 void CTLightBulb::setMired(uint16_t uiMired, float fTransitionTimeS)
 {
-    QJsonObject cl_object{ {"ct", uiMired } };
-    changeState(std::move(cl_object),fTransitionTimeS);
+    setTemperature( LightTemperature::fromMired( uiMired ), fTransitionTimeS );
 }
-
-bool CTLightBulb::setStateData(const QJsonObject &rclObject)
-{
-    bool b_changed = LightBulb::setStateData(rclObject);
-    LightTemperature cl_temperature = LightTemperature::fromMired( rclObject.value("ct").toInt() );
-    b_changed = b_changed || cl_temperature != m_clTemperature;
-    m_clTemperature = cl_temperature;
-    return b_changed;
-}
-

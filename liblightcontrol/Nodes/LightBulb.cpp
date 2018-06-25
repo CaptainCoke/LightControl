@@ -6,24 +6,45 @@
 #include "LightBulbState.h"
 
 
+LightBulb::LightBulb(const QString& strId)
+: DeviceNode(strId)
+, m_pclCurrentState( std::make_unique<LightBulbState>(false) )
+{
+    connect( this, &DeviceNode::changeStateConfirmed, this, &Node::refreshNode );
+}
+
 LightBulb::~LightBulb() = default;
+
+bool LightBulb::isOn() const
+{
+    return getCurrentState().isOn();
+}
+
+uint8_t LightBulb::brightness() const
+{
+    if ( getCurrentState().hasBrightness() )
+        return getCurrentState().brightness();
+    else
+        return 0;
+}
 
 void LightBulb::setNodeData(const QJsonObject &rclObject)
 {
     DeviceNode::setNodeData( rclObject );
     if ( setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
+    if ( getTargetState() != getCurrentState() )
+        changeToState( getTargetState() );
     refreshPeriodically(1000);
 }
 
 bool LightBulb::setStateData(const QJsonObject &rclObject)
 {
-    bool    b_reachable = rclObject.value("reachable").toBool();
-    bool    b_on        = rclObject.value("on").toBool();
-    uint8_t ui_bri      = static_cast<uint8_t>(rclObject.value("bri").toInt());
-    bool b_changed = setReachable(b_reachable) || b_on != m_bOn || ui_bri != m_uiBrightness;
-    m_bOn          = b_on;
-    m_uiBrightness = ui_bri;
+    bool b_reachable = rclObject.value("reachable").toBool();
+    LightBulbState cl_new_state = LightBulbState::fromSceneSettings( rclObject );
+
+    bool b_changed = setReachable(b_reachable) || getCurrentState() != cl_new_state;
+    getCurrentState() = std::move( cl_new_state );
     return b_changed;
 }
 
@@ -44,36 +65,51 @@ QString LightBulb::nodeType() const
     return "light";
 }
 
-void LightBulb::setToState(const LightBulbState &rclState)
+void LightBulb::changeToState(const LightBulbState &rclState, float fTransitionTimeSeconds )
 {
-    if ( rclState.hasBrightness() )
-        setBrightness( rclState.brightness() );
-    setOn( rclState.isOn() );
+    changeState( rclState.toJson(), fTransitionTimeSeconds );
 }
 
-LightBulbState LightBulb::getCurrentState() const
+const LightBulbState& LightBulb::getCurrentState() const
 {
-    LightBulbState cl_state(m_bOn);
-    cl_state.setBrightness(m_uiBrightness);
-    return cl_state;
+    return *m_pclCurrentState;
+}
+
+LightBulbState& LightBulb::getCurrentState()
+{
+    return *m_pclCurrentState;
+}
+
+const LightBulbState& LightBulb::getTargetState() const
+{
+    if ( m_pclTargetState )
+        return *m_pclTargetState;
+    else
+        return *m_pclCurrentState;
+}
+
+LightBulbState& LightBulb::getTargetState()
+{
+    if ( !m_pclTargetState )
+        m_pclTargetState = std::make_unique<LightBulbState>( getCurrentState() );
+    return *m_pclTargetState;
 }
 
 void LightBulb::setOn( bool bOn )
 {
-    if ( m_bOn != bOn )
-    {
-        changeState({ {"on", bOn } });
-        m_bOn = bOn;
-        emit stateChanged();
-    }
+    getTargetState().setOn(bOn);
+    if ( getTargetState() != getCurrentState() )
+        changeToState( getTargetState() );
 }
 
 void LightBulb::setBrightness(uint8_t uiBrightness, float fTransitionTimeS )
 {
-    if ( uiBrightness != m_uiBrightness )
-    {
-        changeState({ {"bri", uiBrightness } },fTransitionTimeS);
-        m_uiBrightness = uiBrightness;
-        emit stateChanged();
-    }
+    getTargetState().setBrightness(uiBrightness);
+    if ( getTargetState() != getCurrentState() )
+        changeToState( getTargetState(), fTransitionTimeS );
+}
+
+void LightBulb::setTargetState(const LightBulbState &rclState)
+{
+    getTargetState() = rclState;
 }

@@ -10,13 +10,11 @@ class RGBLightBulb : public LightBulb
 public:
     ~RGBLightBulb() override = default;
 
-    LightColor color() const { return m_clColor; }
+    LightColor color() const;
 
     static bool isRGBLight( const QJsonObject &rclObject );
 
     void setColor( LightColor clColor, float fTransitionTimeS = 0.f );
-    void setToState( const LightBulbState& rclState ) override;
-    LightBulbState getCurrentState() const override;
 
     int hue() const;
     uint8_t saturation() const;
@@ -27,10 +25,6 @@ public slots:
 
 protected:
     using LightBulb::LightBulb;
-    bool setStateData(const QJsonObject &rclObject) override;
-
-private:
-    LightColor m_clColor = LightColor::fromXY(0.5,0.5);
 };
 
 #endif // RGBLIGHTBULB_H

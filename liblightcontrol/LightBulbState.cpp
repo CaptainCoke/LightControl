@@ -72,7 +72,7 @@ void LightBulbState::setTemperature( LightTemperature clTemperature )
     m_clColor.reset();
 }
 
-bool LightBulbState::operator==(const LightBulbState &rclOther)
+bool LightBulbState::operator==(const LightBulbState &rclOther) const
 {
     if ( isOn() != rclOther.isOn() ) return false;
     if ( hasBrightness()  && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) ) return false;
@@ -97,7 +97,7 @@ bool LightBulbState::operator==(const LightBulbState &rclOther)
     return true;
 }
 
-bool LightBulbState::operator!=(const LightBulbState &rclOther)
+bool LightBulbState::operator!=(const LightBulbState &rclOther) const
 {
     return !operator==(rclOther);
 }
@@ -115,9 +115,22 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
         if ( cl_color_mode.toString() == "ct" )
             cl_state.setTemperature( LightTemperature::fromMired( rclSettings.value("ct").toInt() ) );
         else if ( cl_color_mode.toString() == "xy" )
-            cl_state.setColor( LightColor::fromXY(
-                rclSettings.value("x").toDouble(),
-                rclSettings.value("y").toDouble() ) );
+        {
+            QJsonArray cl_xy = rclSettings.value("xy").toArray();
+            if ( cl_xy.isEmpty() )
+                cl_state.setColor( LightColor::fromXY(
+                    rclSettings.value("x").toDouble(),
+                    rclSettings.value("y").toDouble() ) );
+            else
+                cl_state.setColor( LightColor::fromXY(
+                    cl_xy[0].toDouble(),
+                    cl_xy[1].toDouble() ) );
+        }
+        else if ( cl_color_mode.toString() == "hs" )
+            cl_state.setColor( LightColor::fromHSV(
+                static_cast<int>((rclSettings.value("hue").toDouble() / 65535)*360),
+                static_cast<uint8_t>(rclSettings.value("sat").toInt()),
+                static_cast<uint8_t>(rclSettings.value("bri").toInt()) ));
     }
 
     return cl_state;
@@ -128,9 +141,9 @@ QJsonObject LightBulbState::toJson() const
     QJsonObject cl_object;
     cl_object.insert( "on", isOn() );
     if ( hasBrightness() )
-        cl_object.insert( "bri", brightness() );
+        cl_object.insert( "bri", static_cast<int>(brightness()) );
     if ( hasTemperature() )
-        cl_object.insert( "ct", temperature().mired() );
+        cl_object.insert( "ct", static_cast<int>(temperature().mired()) );
     if ( hasColor() )
         cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
 

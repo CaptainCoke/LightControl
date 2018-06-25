@@ -173,8 +173,11 @@ void switchLightsOnButtonPress(LightGroup& rclGroup, RemoteControl::Button butto
     {
         if ( rclGroup.anyOn() )
         {
+            if ( rclGroup.getCurrentScene() )
+                qDebug() << "set group" << rclGroup.name() << "to next scene after scene" << rclGroup.getCurrentScene()->name();
+            else
+                qDebug() << "set group" << rclGroup.name() << "to first scene";
             rclGroup.setNextScene();
-            qDebug() << "set group" << rclGroup.name() << "to scene" << rclGroup.getCurrentScene()->name();
         }
         break;
     }
@@ -182,8 +185,11 @@ void switchLightsOnButtonPress(LightGroup& rclGroup, RemoteControl::Button butto
     {
         if ( rclGroup.anyOn() )
         {
+            if ( rclGroup.getCurrentScene() )
+                qDebug() << "set group" << rclGroup.name() << "to scene before scene" << rclGroup.getCurrentScene()->name();
+            else
+                qDebug() << "set group" << rclGroup.name() << "to first scene";
             rclGroup.setPreviousScene();
-            qDebug() << "set group" << rclGroup.name() << "to scene" << rclGroup.getCurrentScene()->name();
         }
         break;
     }

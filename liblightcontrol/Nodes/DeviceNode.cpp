@@ -26,6 +26,6 @@ void DeviceNode::changeState( QJsonObject clObject, float fTransitionTimeS)
     {
         clObject.insert("transitiontime", static_cast<int>(fTransitionTimeS * 10) );
     }
-    GatewayAccess::instance().put(nodeType()+"s/"+id()+"/state", QJsonDocument(clObject).toJson(), [](const QJsonArray&){});
+    GatewayAccess::instance().put(nodeType()+"s/"+id()+"/state", QJsonDocument(clObject).toJson(), [this](const QJsonArray&){ emit changeStateConfirmed(); });
 
 }

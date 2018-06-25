@@ -4,6 +4,7 @@
 #include <QJsonArray>
 #include "LightBulb.h"
 #include "LightGroupScene.h"
+#include "LightBulbState.h"
 
 LightGroup::~LightGroup() = default;
 
@@ -29,7 +30,7 @@ void LightGroup::setNodeData(const QJsonObject &rclObject)
 
 bool LightGroup::anyOn() const
 {
-    for ( const auto& pcl_light : lights()  )
+    for ( const auto& pcl_light : lights() )
         if ( pcl_light->isOn() )
             return true;
     return false;
@@ -37,9 +38,25 @@ bool LightGroup::anyOn() const
 
 bool LightGroup::allOn() const
 {
+    auto pcl_scene = getCurrentScene();
     for ( const auto& pcl_light : lights() )
-        if ( !pcl_light->isOn() )
+    {
+        bool b_should_be_on;
+        if ( pcl_scene )
+        {
+            const auto & map_states = pcl_scene->getStates();
+            auto it_light_state = map_states.find( pcl_light->id() );
+            if ( it_light_state != map_states.end() && it_light_state->second.isOn() )
+                b_should_be_on = true;
+            else
+                b_should_be_on = false;
+        }
+        else
+            b_should_be_on = true;
+
+        if ( !pcl_light->isOn() && b_should_be_on )
             return false;
+    }
     return true;
 }
 
@@ -170,7 +187,7 @@ bool LightGroup::setScenes(const QJsonArray &rclArray)
         else
             it_scene++;
     auto pcl_current_scene = getCurrentScene();
-    if ( !pcl_current_scene || !pcl_current_scene->isActive() )
+    if ( !pcl_current_scene || ( anyOn() && !pcl_current_scene->isActive() ) )
     {
         m_strCurrentScene.clear();
         b_changed = true;

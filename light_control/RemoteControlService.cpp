@@ -164,9 +164,19 @@ void switchLightsOnButtonPress(LightGroup& rclGroup, RemoteControl::Button butto
     case RemoteControl::Button::Power:
     {
         bool b_all_lights_on = rclGroup.anyOn() ? false : true;
-        qDebug() << "switching lights of group" << rclGroup.name() << (b_all_lights_on ? "on" : "off");
-        for ( const auto &pcl_light : rclGroup.lights() )
-            pcl_light->setOn(b_all_lights_on);
+
+        auto pcl_current_scene = rclGroup.getCurrentScene();
+        if ( pcl_current_scene && b_all_lights_on )
+        {
+            qDebug() << "applying last scene of group" << rclGroup.name() << ":" << pcl_current_scene->name();
+            pcl_current_scene->apply();
+        }
+        else
+        {
+            qDebug() << "switching all lights of group" << rclGroup.name() << (b_all_lights_on ? "on" : "off");
+            for ( const auto &pcl_light : rclGroup.lights() )
+                pcl_light->setOn(b_all_lights_on);
+        }
         break;
     }
     case RemoteControl::Button::Next:

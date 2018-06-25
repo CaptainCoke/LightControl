@@ -75,6 +75,8 @@ void LightBulbState::setTemperature( LightTemperature clTemperature )
 bool LightBulbState::operator==(const LightBulbState &rclOther) const
 {
     if ( isOn() != rclOther.isOn() ) return false;
+    if ( !isOn() ) // off is always the same as off...
+        return true;
     if ( hasBrightness()  && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) ) return false;
     if ( hasTemperature() )
     {

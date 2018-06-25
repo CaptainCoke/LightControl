@@ -78,8 +78,12 @@ void LightGroupWidget::setLightOnState(int iState)
         break;
     }
 
-    for ( const auto &pcl_light : pcl_group->lights() )
-        pcl_light->setOn(b_all_lights_on);
+    auto pcl_current_scene = pcl_group->getCurrentScene();
+    if ( pcl_current_scene && b_all_lights_on )
+        pcl_current_scene->apply();
+    else
+        for ( const auto &pcl_light : pcl_group->lights() )
+            pcl_light->setOn(b_all_lights_on);
 }
 
 void LightGroupWidget::showSceneInfo(QListWidgetItem* pclItem, QListWidgetItem*)

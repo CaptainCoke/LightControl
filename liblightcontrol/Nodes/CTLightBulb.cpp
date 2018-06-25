@@ -4,7 +4,10 @@
 
 LightTemperature CTLightBulb::temperature() const
 {
-    return getCurrentState().temperature();
+    if ( getCurrentState().hasTemperature() )
+        return getCurrentState().temperature();
+    else
+        return m_clMinTemperature;
 }
 
 bool CTLightBulb::isCTLight(const QJsonObject &rclObject)

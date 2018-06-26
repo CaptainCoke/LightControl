@@ -10,7 +10,10 @@ LIBS += ../liblightcontrol/liblightcontrol.a
 
 SOURCES += \
     main.cpp \
-    RemoteControlService.cpp
+    RemoteControlService.cpp \
+    NetworkService.cpp
 
 HEADERS += \
-    RemoteControlService.h
+    RemoteControlService.h \
+    NetworkService.h \
+    NodeTools.h

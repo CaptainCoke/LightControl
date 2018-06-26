@@ -3,6 +3,7 @@
 #include <QSettings>
 #include "GatewayAccess.h"
 #include "RemoteControlService.h"
+#include "NetworkService.h"
 
 int main(int argc, char *argv[])
 {
@@ -29,7 +30,10 @@ int main(int argc, char *argv[])
 
     GatewayAccess::instance().setConnection( str_address, str_api_key );
 
-    RemoteControlService s;
-    s.start();
+    NetworkService network;
+    RemoteControlService remotes;
+    QObject::connect( &network, &NetworkService::networkUp, &remotes, &RemoteControlService::start );
+    QObject::connect( &network, &NetworkService::networkDown, &remotes, &RemoteControlService::stop );
+    network.start();
     return a.exec();
 }

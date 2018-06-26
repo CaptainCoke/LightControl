@@ -70,6 +70,11 @@ QString LightGroup::nodeType() const
     return "group";
 }
 
+bool LightGroup::isEmpty() const
+{
+    return m_mapScenes.empty() && m_lstLightIds.empty();
+}
+
 std::shared_ptr<LightGroupScene> LightGroup::getCurrentScene() const
 {
     auto it_scene = m_mapScenes.find( m_strCurrentScene );

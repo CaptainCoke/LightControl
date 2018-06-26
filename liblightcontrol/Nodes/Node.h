@@ -17,6 +17,7 @@ public:
     virtual void setNodeData(const QJsonObject &rclObject);
 
     virtual QString nodeType() const = 0;
+    virtual bool isEmpty() const { return false; }
 
     QString uniqueId() const { return nodeType() + id(); }
 

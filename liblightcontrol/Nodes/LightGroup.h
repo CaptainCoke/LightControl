@@ -20,6 +20,7 @@ public:
     void setNodeData(const QJsonObject &rclObject) override;
 
     QString nodeType() const override;
+    bool isEmpty() const override;
 
     std::shared_ptr<LightGroupScene> getCurrentScene() const;
 

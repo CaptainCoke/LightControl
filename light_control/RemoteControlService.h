@@ -2,6 +2,10 @@
 #define REMOTECONTROLSERVICE_H
 
 #include <QObject>
+#include "Nodes/RemoteControl.h"
+
+class LightGroup;
+class RemoteControlButtonHandler;
 
 class RemoteControlService : public QObject
 {
@@ -16,6 +20,10 @@ public slots:
 
 protected:
     void connectRemotesToGroups();
+    void handleButtonPress( RemoteControl::Button button, LightGroup& rclGroup );
+
+private:
+    std::map<RemoteControl::Button,std::shared_ptr<RemoteControlButtonHandler>> m_mapButtonHandler;
 };
 
 #endif // REMOTECONTROLSERVICE_H

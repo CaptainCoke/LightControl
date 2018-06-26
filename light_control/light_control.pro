@@ -11,9 +11,16 @@ LIBS += ../liblightcontrol/liblightcontrol.a
 SOURCES += \
     main.cpp \
     RemoteControlService.cpp \
-    NetworkService.cpp
+    NetworkService.cpp \
+    PowerButtonHandler.cpp \
+    SceneButtonHandler.cpp \
+    BrightnessButtonHandler.cpp
 
 HEADERS += \
     RemoteControlService.h \
     NetworkService.h \
-    NodeTools.h
+    NodeTools.h \
+    RemoteControlButtonHandler.h \
+    PowerButtonHandler.h \
+    SceneButtonHandler.h \
+    BrightnessButtonHandler.h

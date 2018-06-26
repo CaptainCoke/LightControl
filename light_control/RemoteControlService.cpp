@@ -1,16 +1,22 @@
 #include "RemoteControlService.h"
 #include <QSettings>
-#include "Nodes/LightBulb.h"
-#include "Nodes/LightGroupScene.h"
-#include "Nodes/LightGroup.h"
-#include "Nodes/RemoteControl.h"
-#include "LightBulbState.h"
 #include "GatewayAccess.h"
+#include "Nodes/RemoteControl.h"
+#include "Nodes/LightGroup.h"
 #include "NodeTools.h"
+#include "PowerButtonHandler.h"
+#include "SceneButtonHandler.h"
+#include "BrightnessButtonHandler.h"
+
 
 RemoteControlService::RemoteControlService(QObject *parent)
 : QObject(parent)
 {
+    m_mapButtonHandler.emplace( RemoteControl::Button::Power, std::make_shared<PowerButtonHandler>() );
+    m_mapButtonHandler.emplace( RemoteControl::Button::Next, SceneButtonHandler::nextScene() );
+    m_mapButtonHandler.emplace( RemoteControl::Button::Previous, SceneButtonHandler::previousScene() );
+    m_mapButtonHandler.emplace( RemoteControl::Button::Brighter, std::make_shared<BrightnessButtonHandler>(32) );
+    m_mapButtonHandler.emplace( RemoteControl::Button::Dimmer, std::make_shared<BrightnessButtonHandler>(-32) );
 }
 
 RemoteControlService::~RemoteControlService() = default;
@@ -24,75 +30,13 @@ void RemoteControlService::stop()
 {
 }
 
-void switchLightsOnButtonPress(LightGroup& rclGroup, RemoteControl::Button button)
+void RemoteControlService::handleButtonPress( RemoteControl::Button button, LightGroup& rclGroup )
 {
-    switch ( button )
-    {
-    case RemoteControl::Button::Power:
-    {
-        bool b_all_lights_on = rclGroup.anyOn() ? false : true;
-
-        auto pcl_current_scene = rclGroup.getCurrentScene();
-        if ( pcl_current_scene && b_all_lights_on )
-        {
-            qDebug() << "applying last scene of group" << rclGroup.name() << ":" << pcl_current_scene->name();
-            pcl_current_scene->apply();
-        }
-        else
-        {
-            qDebug() << "switching all lights of group" << rclGroup.name() << (b_all_lights_on ? "on" : "off");
-            for ( const auto &pcl_light : rclGroup.lights() )
-                pcl_light->setOn(b_all_lights_on);
-        }
-        break;
-    }
-    case RemoteControl::Button::Next:
-    {
-        if ( rclGroup.anyOn() )
-        {
-            if ( rclGroup.getCurrentScene() )
-                qDebug() << "set group" << rclGroup.name() << "to next scene after scene" << rclGroup.getCurrentScene()->name();
-            else
-                qDebug() << "set group" << rclGroup.name() << "to first scene";
-            rclGroup.setNextScene();
-        }
-        break;
-    }
-    case RemoteControl::Button::Previous:
-    {
-        if ( rclGroup.anyOn() )
-        {
-            if ( rclGroup.getCurrentScene() )
-                qDebug() << "set group" << rclGroup.name() << "to scene before scene" << rclGroup.getCurrentScene()->name();
-            else
-                qDebug() << "set group" << rclGroup.name() << "to first scene";
-            rclGroup.setPreviousScene();
-        }
-        break;
-    }
-    case RemoteControl::Button::Brighter:
-    {
-        if ( rclGroup.anyOn() )
-        {
-            qDebug() << "increasing brightness of group" << rclGroup.name() << "by 32";
-            for ( const auto &pcl_light : rclGroup.lights() )
-                pcl_light->setBrightness(std::min(255,pcl_light->brightness()+32));
-        }
-        break;
-    }
-    case RemoteControl::Button::Dimmer:
-    {
-        if ( rclGroup.anyOn() )
-        {
-            qDebug() << "reducing brightness of group" << rclGroup.name() << "by 32";
-            for ( const auto &pcl_light : rclGroup.lights() )
-                pcl_light->setBrightness(std::max(1,pcl_light->brightness()-32));
-        }
-        break;
-    }
-    default:
-        break;
-    }
+    auto it_handler = m_mapButtonHandler.find(button);
+    if ( it_handler != m_mapButtonHandler.end() )
+        it_handler->second->workOn(rclGroup);
+    else
+        qDebug() << "no handler for button " << static_cast<int>(button);
 }
 
 void RemoteControlService::connectRemotesToGroups()
@@ -113,7 +57,7 @@ void RemoteControlService::connectRemotesToGroups()
         try {
             remote = getByName<RemoteControl>(str_remote_name);
             group  = getByName<LightGroup>(str_group_name);
-            QObject::connect( remote.get(), &RemoteControl::buttonPressed, [group](RemoteControl::Button b){ switchLightsOnButtonPress( *group, b ); } );
+            QObject::connect( remote.get(), &RemoteControl::buttonPressed, [this,group](RemoteControl::Button b){ handleButtonPress( b, *group ); } );
         } catch ( const std::exception& e ) {
             qCritical() << "finding remote or group for connection" << i << "failed: " << e.what();
         }

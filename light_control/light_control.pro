@@ -14,7 +14,8 @@ SOURCES += \
     NetworkService.cpp \
     PowerButtonHandler.cpp \
     SceneButtonHandler.cpp \
-    BrightnessButtonHandler.cpp
+    BrightnessButtonHandler.cpp \
+    AlarmService.cpp
 
 HEADERS += \
     RemoteControlService.h \
@@ -23,4 +24,5 @@ HEADERS += \
     RemoteControlButtonHandler.h \
     PowerButtonHandler.h \
     SceneButtonHandler.h \
-    BrightnessButtonHandler.h
+    BrightnessButtonHandler.h \
+    AlarmService.h

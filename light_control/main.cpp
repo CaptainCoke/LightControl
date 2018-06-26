@@ -4,6 +4,7 @@
 #include "GatewayAccess.h"
 #include "RemoteControlService.h"
 #include "NetworkService.h"
+#include "AlarmService.h"
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +33,9 @@ int main(int argc, char *argv[])
 
     NetworkService network;
     RemoteControlService remotes;
+    AlarmService alarms;
+    QObject::connect( &network, &NetworkService::networkUp, &alarms, &AlarmService::start );
+    QObject::connect( &network, &NetworkService::networkDown, &alarms, &AlarmService::stop );
     QObject::connect( &network, &NetworkService::networkUp, &remotes, &RemoteControlService::start );
     QObject::connect( &network, &NetworkService::networkDown, &remotes, &RemoteControlService::stop );
     network.start();

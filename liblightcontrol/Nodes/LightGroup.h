@@ -23,6 +23,8 @@ public:
     bool isEmpty() const override;
 
     std::shared_ptr<LightGroupScene> getCurrentScene() const;
+    std::shared_ptr<LightGroupScene> getNextScene() const;
+    std::shared_ptr<LightGroupScene> getPreviousScene() const;
 
 public slots:
     void setNextScene();

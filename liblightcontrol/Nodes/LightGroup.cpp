@@ -84,24 +84,40 @@ std::shared_ptr<LightGroupScene> LightGroup::getCurrentScene() const
         return nullptr;
 }
 
-void LightGroup::setNextScene()
+std::shared_ptr<LightGroupScene> LightGroup::getNextScene() const
 {
     auto it_scene = m_mapScenes.find( m_strCurrentScene );
     it_scene++;
     if ( it_scene == m_mapScenes.end() && !m_mapScenes.empty() ) // wrap aound
         it_scene = m_mapScenes.begin();
     if ( it_scene != m_mapScenes.end() )
-        it_scene->second->apply();
+        return it_scene->second;
+    else
+        return nullptr;
 }
 
-void LightGroup::setPreviousScene()
+std::shared_ptr<LightGroupScene> LightGroup::getPreviousScene() const
 {
     auto it_scene = std::find_if( m_mapScenes.rbegin(), m_mapScenes.rend(), [this](const auto & rcl_entry){ return rcl_entry.first == m_strCurrentScene; } );
     it_scene++;
     if ( it_scene == m_mapScenes.rend() && !m_mapScenes.empty() ) // wrap aound
         it_scene = m_mapScenes.rbegin();
     if ( it_scene != m_mapScenes.rend() )
-        it_scene->second->apply();
+        return it_scene->second;
+    else
+        return nullptr;
+}
+
+void LightGroup::setNextScene()
+{
+    if ( auto next_scene = getNextScene() )
+        next_scene->apply();
+}
+
+void LightGroup::setPreviousScene()
+{
+    if ( auto previous_scene = getPreviousScene() )
+        previous_scene->apply();
 }
 
 void LightGroup::setCurrentScene( const QString& strSceneId )

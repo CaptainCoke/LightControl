@@ -13,16 +13,15 @@ void SceneButtonHandler::workOn(LightGroup &rclGroup)
     {
         if ( rclGroup.getCurrentScene() )
         {
-            if ( m_bForward )
+            auto next_scene = m_bForward ? rclGroup.getNextScene() : rclGroup.getPreviousScene();
+
+            if ( next_scene )
             {
-                qDebug() << "set group" << rclGroup.name() << "to next scene after scene" << rclGroup.getCurrentScene()->name();
-                rclGroup.setNextScene();
+                qDebug() << "set group" << rclGroup.name() << "to scene" << next_scene->name();
+                next_scene->apply();
             }
             else
-            {
-                qDebug() << "set group" << rclGroup.name() << "to previous scene before scene" << rclGroup.getCurrentScene()->name();
-                rclGroup.setPreviousScene();
-            }
+                qWarning() << "group" << rclGroup.name() << "has no" << ( m_bForward ? "next" : "previous" ) << "scene";
         }
         else
         {
@@ -30,7 +29,6 @@ void SceneButtonHandler::workOn(LightGroup &rclGroup)
             qDebug() << "set group" << rclGroup.name() << "to first scene" << pcl_first_scene->name();
             pcl_first_scene->apply();
         }
-
     }
 }
 

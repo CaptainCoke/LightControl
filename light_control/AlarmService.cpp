@@ -25,7 +25,7 @@ public:
         auto seconds_to_alarm = QTime::currentTime().secsTo( m_clTime );
         if ( seconds_to_alarm < 0 || seconds_to_alarm > 10 )
             return;
-        auto seconds_since_last_active = QDateTime::currentDateTime().secsTo( m_clLastActivated );
+        auto seconds_since_last_active = m_clLastActivated.secsTo( QDateTime::currentDateTime() );
         if ( m_clLastActivated.isValid() && seconds_since_last_active < 60 )
             return;
 

@@ -26,6 +26,7 @@ SOURCES += \
     LightBulbState.cpp \
     LightColor.cpp \
     LightTemperature.cpp \
+    NetworkService.cpp \
     Nodes/LightBulb.cpp \
     Nodes/RGBLightBulb.cpp \
     Nodes/CTLightBulb.cpp \
@@ -41,6 +42,8 @@ HEADERS += \
     LightBulbState.h \
     LightColor.h \
     LightTemperature.h \
+    NetworkService.h \
+    NodeTools.h \
     Nodes/LightBulb.h \
     Nodes/RGBLightBulb.h \
     Nodes/CTLightBulb.h \

@@ -9,6 +9,7 @@ class LightControl;
 }
 
 class NodeWidget;
+class NetworkService;
 
 class LightControl : public QMainWindow
 {
@@ -19,18 +20,14 @@ public:
     ~LightControl() override;
 
 public slots:
-    void updateFullState();
+    void updateWidgets();
 
 protected slots:
     void removeWidget(QString);
 
 private:
-    void updateFullState( const QJsonObject& mapState );
-    void updateLightWidgets( const QJsonObject& mapLights );
-    void updateSensorWidgets( const QJsonObject& mapSensors );
-    void updateGroups( const QJsonObject& mapGroups );
     template<class NodeFactory,class WidgetFactory>
-    void updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout);
+    QStringList updateWidget(QLayout* pclLayout);
 
     std::unique_ptr<Ui::LightControl> m_pclUI;
     std::map<QString,NodeWidget*> m_mapNodeWidgets;

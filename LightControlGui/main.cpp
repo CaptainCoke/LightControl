@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include "LightControl.h"
 #include "GatewayAccess.h"
+#include "NetworkService.h"
 
 int main(int argc, char *argv[])
 {
@@ -41,9 +42,13 @@ int main(int argc, char *argv[])
 
     GatewayAccess::instance().setConnection( str_address, str_api_key );
 
-    LightControl w;
-    w.show();
-    w.updateFullState();
+    LightControl gui;
+    NetworkService network;
+    QObject::connect( &network, &NetworkService::networkUp, &gui, &LightControl::updateWidgets );
+    QObject::connect( &network, &NetworkService::networkDown, &gui, &LightControl::updateWidgets );
+
+    network.start();
+    gui.show();
 
     return a.exec();
 }

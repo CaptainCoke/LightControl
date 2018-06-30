@@ -31,11 +31,6 @@ LightControl::LightControl(QWidget *parent)
 
 LightControl::~LightControl() = default;
 
-void LightControl::updateFullState()
-{
-    GatewayAccess::instance().get( "", [this](const QJsonObject& rclObject){ updateFullState(rclObject); } );
-}
-
 void LightControl::removeWidget(QString strUniqueId)
 {
     auto it_widget = m_mapNodeWidgets.find(strUniqueId);
@@ -50,49 +45,42 @@ void LightControl::removeWidget(QString strUniqueId)
 }
 
 template<class NodeFactory,class WidgetFactory>
-void LightControl::updateWidget(const QJsonObject& mapNodeData, QLayout* pclLayout)
+QStringList LightControl::updateWidget(QLayout* pclLayout)
 {
-    for ( auto it_node = mapNodeData.constBegin(); it_node != mapNodeData.constEnd(); ++it_node )
+    QStringList lst_widget_ids;
+    for ( const auto& [str_node_id, pcl_node] : NodeFactory::getAll() )
     {
-        QJsonObject cl_node = it_node.value().toObject();
-        QString str_node_id = it_node.key();
-        auto pcl_node = NodeFactory::get(str_node_id);
-        if ( pcl_node )
-            pcl_node->setNodeData( cl_node );
-        else
-            pcl_node = NodeFactory::create( str_node_id, cl_node );
-        auto it_widget = m_mapNodeWidgets.find( pcl_node->uniqueId() );
+        (void)str_node_id;
+        QString str_widget_id = pcl_node->uniqueId();
+        lst_widget_ids << str_widget_id;
+        auto it_widget = m_mapNodeWidgets.find( str_widget_id );
         if ( it_widget == m_mapNodeWidgets.end() )
         {
             auto* pcl_widget = WidgetFactory::createWidget(pcl_node);
             pclLayout->addWidget(pcl_widget);
-            m_mapNodeWidgets[pcl_node->uniqueId()] = pcl_widget;
+            m_mapNodeWidgets[str_widget_id] = pcl_widget;
+            connect( pcl_node.get(), &Node::nodeDeleted, this, &LightControl::removeWidget );
         }
-        connect( pcl_node.get(), &Node::nodeDeleted, this, &LightControl::removeWidget );
-        connect( pcl_node.get(), &Node::nodeDeleted, [str_node_id]{ NodeFactory::remove(str_node_id); } );
     }
+    return lst_widget_ids;
 }
 
-void LightControl::updateLightWidgets(const QJsonObject& mapLights)
+void LightControl::updateWidgets()
 {
-    updateWidget<LightBulb,LightBulbWidget>(mapLights,m_pclUI->lightsWidget->layout());
-}
+    QStringList lst_widget_ids;
+    lst_widget_ids.append( updateWidget<LightBulb,LightBulbWidget>(m_pclUI->lightsWidget->layout()) );
+    lst_widget_ids.append( updateWidget<Sensor,SensorWidget>(m_pclUI->sensorsWidget->layout()) );
+    lst_widget_ids.append( updateWidget<LightGroup,LightGroupWidget>(m_pclUI->groupsWidget->layout()) );
 
-void LightControl::updateSensorWidgets(const QJsonObject& mapSensors)
-{
-    updateWidget<Sensor,SensorWidget>(mapSensors,m_pclUI->sensorsWidget->layout());
-}
-
-void LightControl::updateGroups(const QJsonObject& mapGroups)
-{
-    updateWidget<LightGroup,LightGroupWidget>(mapGroups,m_pclUI->groupsWidget->layout());
-}
-
-void LightControl::updateFullState(const QJsonObject& mapState)
-{
-    updateLightWidgets( mapState.value("lights").toObject() );
-    updateGroups( mapState.value("groups").toObject() );
-    updateSensorWidgets( mapState.value("sensors").toObject() );
+    QStringList lst_removed_widgets;
+    for ( const auto&[str_widget_id,pcl_widget] : m_mapNodeWidgets )
+    {
+        (void)pcl_widget;
+        if ( !lst_widget_ids.contains( str_widget_id ) )
+            lst_removed_widgets <<str_widget_id;
+    }
+    for ( const QString &str_widget_id : lst_removed_widgets )
+        removeWidget(str_widget_id);
     for ( const auto&[key,pcl_widget] : m_mapNodeWidgets )
     {
         (void)key;

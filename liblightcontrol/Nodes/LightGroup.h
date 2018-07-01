@@ -19,6 +19,7 @@ public:
     const std::map<QString,std::shared_ptr<LightGroupScene>>& scenes() const { return m_mapScenes; }
 
     void setNodeData(const QJsonObject &rclObject) override;
+    virtual void handlePushUpdate(const QJsonObject &rclObject);
 
     const QString& nodeType() const override;
     bool isEmpty() const override;

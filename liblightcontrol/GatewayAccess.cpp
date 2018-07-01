@@ -42,6 +42,11 @@ QString GatewayAccess::requestApiKey( const QString& strGatewayAddress )
     return cl_doc.array()[0].toObject().value("success").toObject().value("username").toString();
 }
 
+QUrl GatewayAccess::getAddress() const
+{
+    return QUrl( m_strBaseUrl );
+}
+
 QNetworkRequest GatewayAccess::createApiRequest(const QString &strSubURL, const QString& strEtag) const
 {
     QNetworkRequest cl_request(QUrl(m_strBaseUrl+strSubURL));

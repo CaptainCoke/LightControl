@@ -15,6 +15,7 @@ public:
     uint8_t battery() const { return m_uiBattery; }
 
     void setNodeData(const QJsonObject &rclObject) override;
+    virtual void handlePushUpdate(const QJsonObject &rclObject);
 
     const QString& nodeType() const override;
 

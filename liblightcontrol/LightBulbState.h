@@ -38,6 +38,8 @@ public:
     bool operator==( const LightBulbState& rclOther ) const;
     bool operator!=( const LightBulbState& rclOther ) const;
 
+    void updateSettingsFromJson( const QJsonObject& rclSettings );
+
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );
     QJsonObject toJson() const;
 
@@ -47,5 +49,7 @@ protected:
     std::optional<LightColor>       m_clColor;
     std::optional<LightTemperature> m_clTemperature;
 };
+
+QDebug& operator<<(QDebug& rclStream, const LightBulbState& rclState);
 
 #endif // LIGHTBULBSTATE_H

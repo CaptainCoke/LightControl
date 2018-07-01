@@ -21,7 +21,6 @@ public:
 
     static bool isRemoteControl( const QJsonObject &rclObject );
 
-    void setNodeData(const QJsonObject &rclObject) override;
 signals:
     void buttonPressed(Button);
     void buttonReleased(Button);

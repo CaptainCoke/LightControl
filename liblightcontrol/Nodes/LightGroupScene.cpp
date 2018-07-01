@@ -46,13 +46,18 @@ bool LightGroupScene::isActive()
     return true;
 }
 
+void LightGroupScene::enforce()
+{
+    for ( const auto &[str_light, rcl_state] : m_mapLightStates )
+    {
+        LightBulb::get( str_light )->setTargetState( rcl_state );
+    }
+}
+
 void LightGroupScene::apply()
 {
     GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
-        for ( const auto &[str_light, rcl_state] : m_mapLightStates )
-        {
-            LightBulb::get( str_light )->setTargetState( rcl_state );
-        }
+        enforce();
         emit sceneApplied();
     });
 }

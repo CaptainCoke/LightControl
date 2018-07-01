@@ -1,5 +1,6 @@
 #include "RemoteControl.h"
 #include <QJsonObject>
+#include <QtDebug>
 
 bool RemoteControl::isRemoteControl(const QJsonObject &rclObject)
 {
@@ -59,16 +60,12 @@ bool RemoteControl::setConfigData(const QJsonObject &rclObject)
     return b_changed;
 }
 
-void RemoteControl::setNodeData(const QJsonObject &rclObject)
-{
-    Sensor::setNodeData( rclObject );
-    refreshPeriodically(200);
-}
-
 bool RemoteControl::signalButtonEvent(int iButtonEvent)
 {
     bool b_changed = iButtonEvent == m_iButtonEvent;
     m_iButtonEvent = iButtonEvent;
+
+    qDebug() << "button event" << iButtonEvent << secondsSinceLastUpdate() << "seconds ago";
 
     if ( secondsSinceLastUpdate() < 1 )
     {

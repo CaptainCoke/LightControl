@@ -41,7 +41,6 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
         qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "--> enforcing target state";
         changeToState( getTargetState() );
     }
-    refreshPeriodically(1000);
 }
 
 bool LightBulb::setStateData(const QJsonObject &rclObject)
@@ -52,6 +51,16 @@ bool LightBulb::setStateData(const QJsonObject &rclObject)
     bool b_changed = setReachable(b_reachable) || getCurrentState() != cl_new_state;
     getCurrentState() = std::move( cl_new_state );
     return b_changed;
+}
+
+void LightBulb::handlePushUpdate(const QJsonObject &rclObject)
+{
+    LightBulbState cl_new_state = getCurrentState();
+    cl_new_state.updateSettingsFromJson( rclObject );
+    bool b_changed = cl_new_state != getCurrentState();
+    getCurrentState() = std::move( cl_new_state );
+    if ( b_changed )
+        emit stateChanged();
 }
 
 std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJsonObject &rclObject)

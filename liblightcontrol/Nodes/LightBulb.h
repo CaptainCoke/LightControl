@@ -18,6 +18,7 @@ public:
     uint8_t brightness() const;
 
     void setNodeData(const QJsonObject &rclObject) override;
+    virtual void handlePushUpdate(const QJsonObject &rclObject);
 
     const QString& nodeType() const override;
 

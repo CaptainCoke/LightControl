@@ -23,6 +23,7 @@ public:
     bool isActive();
 
 public slots:
+    void enforce();
     void apply();
     void save();
     void refreshSettings();

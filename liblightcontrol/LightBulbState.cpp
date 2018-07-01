@@ -1,6 +1,7 @@
 #include "LightBulbState.h"
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDebug>
 
 LightBulbState::LightBulbState( bool bOn )
 : m_bOn(bOn)
@@ -102,6 +103,20 @@ bool LightBulbState::operator==(const LightBulbState &rclOther) const
 bool LightBulbState::operator!=(const LightBulbState &rclOther) const
 {
     return !operator==(rclOther);
+}
+
+void LightBulbState::updateSettingsFromJson(const QJsonObject &rclSettings)
+{
+    if ( rclSettings.value("on").isBool() )
+        m_bOn = rclSettings.value("on").toBool();
+    if ( rclSettings.value("bri").isDouble() )
+        m_uiBrightness = rclSettings.value("bri").toInt();
+    if ( rclSettings.value("ct").isDouble() )
+        m_clTemperature = LightTemperature::fromMired( rclSettings.value("ct").toInt() );
+    if ( rclSettings.value("x").isDouble() && hasColor() )
+        m_clColor =LightColor::fromXY( rclSettings.value("x").toDouble(), color().y() );
+    if ( rclSettings.value("y").isDouble() && hasColor() )
+        m_clColor =LightColor::fromXY( color().x(), rclSettings.value("y").toDouble() );
 }
 
 LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)

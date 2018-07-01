@@ -13,6 +13,12 @@ void Sensor::setNodeData(const QJsonObject &rclObject)
         emit stateChanged();
 }
 
+void Sensor::handlePushUpdate(const QJsonObject &rclObject)
+{
+    if ( setStateData( rclObject.value("state").toObject() ) )
+        emit stateChanged();
+}
+
 std::shared_ptr<Sensor> Sensor::createNode(const QString& strId, const QJsonObject &rclObject)
 {
     std::shared_ptr<Sensor> pcl_sensor;

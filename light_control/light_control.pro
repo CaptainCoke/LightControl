@@ -1,4 +1,4 @@
-QT += core network
+QT += core network websockets
 
 TARGET = light_control
 TEMPLATE = app

@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QTimer>
+#include <memory>
+#include <functional>
+
+class QWebSocket;
 
 class NetworkService : public QObject
 {
@@ -25,12 +29,17 @@ signals:
 protected slots:
     void refreshLightNodes();
     void refreshGroupNodes();
+    void refreshWebsocketPort();
+    void handlePushMessage( const QString& strMessage );
 
 protected:
     void updateFullState( const QJsonObject& mapState );
+    void updateWebsocketPort( const QJsonObject& rclConfig );
 
 private:
     QTimer m_clStatePollingTimer;
+    std::unique_ptr<QWebSocket> m_pclWebSocket;
+    std::map<QString,std::function<void(const QJsonObject&)>> m_mapPushMessageHandlers;
     bool m_bIsUp = false;
 };
 

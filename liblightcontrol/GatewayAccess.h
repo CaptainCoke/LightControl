@@ -26,6 +26,7 @@ public:
     static GatewayAccess& instance();
 
     QString requestApiKey(const QString& strGatewayAddress);
+    QUrl getAddress() const;
 
 signals:
     void networkInfo(const QString&);

@@ -2,6 +2,7 @@
 #include <set>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QtDebug>
 #include "LightBulb.h"
 #include "LightGroupScene.h"
 #include "LightBulbState.h"
@@ -27,7 +28,36 @@ void LightGroup::setNodeData(const QJsonObject &rclObject)
     Node::setNodeData( rclObject );
     if ( setScenes( rclObject.value("scenes").toArray() ) | setLights( rclObject.value("lights").toArray() ) | setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
-    refreshPeriodically(5000);
+}
+
+void LightGroup::handlePushUpdate(const QJsonObject &rclObject)
+{
+    if ( rclObject.value("e") == "changed" )
+    {
+        QJsonObject cl_state = rclObject.value("state").toObject();
+        bool b_all_on = cl_state.value("all_on").toBool(m_bAllOn);
+        bool b_any_on = cl_state.value("any_on").toBool(m_bAnyOn);
+        bool b_changed = b_all_on != m_bAllOn || b_any_on != m_bAnyOn;
+        m_bAllOn = b_all_on;
+        m_bAnyOn = b_any_on;
+        if ( b_changed )
+            emit stateChanged();
+    }
+    else if ( rclObject.value("e") == "scene-called" )
+    {
+        QString str_scene_id = rclObject.value("scid").toString();
+        setCurrentScene( str_scene_id );
+
+        // enforce the called scene's light bulb settings
+        auto pcl_scene = getCurrentScene();
+        if ( pcl_scene )
+        {
+            qDebug() << "enforcing scene" << pcl_scene->name() << "of group"<< name();
+            pcl_scene->enforce();
+        }
+    }
+    else
+        qDebug() << name() << rclObject;
 }
 
 bool LightGroup::anyOn() const

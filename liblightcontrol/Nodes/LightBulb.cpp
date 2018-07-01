@@ -46,8 +46,9 @@ void LightBulb::checkAndEnforceTargetState()
         float f_transition_time = 0.f;
         if ( m_clTargetStateTimepoint.isValid() )
             f_transition_time = std::max(0.0f,QDateTime::currentDateTime().msecsTo( m_clTargetStateTimepoint ) / 1000.0f);
-        qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "\nenforcing target state in" << f_transition_time << "seconds";
-        changeToState( getTargetState(), f_transition_time );
+        LightBulbState cl_diff = getTargetState() - getCurrentState();
+        qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "\nenforcing"<< cl_diff <<"in" << f_transition_time << "seconds";
+        changeToState( cl_diff, f_transition_time );
     }
     else
     {

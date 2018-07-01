@@ -38,6 +38,8 @@ public:
     bool operator==( const LightBulbState& rclOther ) const;
     bool operator!=( const LightBulbState& rclOther ) const;
 
+    LightBulbState operator-( const LightBulbState& rclOther ) const;
+
     void updateSettingsFromJson( const QJsonObject& rclSettings );
 
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );

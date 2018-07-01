@@ -109,6 +109,18 @@ bool LightBulbState::operator!=(const LightBulbState &rclOther) const
     return !operator==(rclOther);
 }
 
+LightBulbState LightBulbState::operator-(const LightBulbState &rclOther) const
+{
+    LightBulbState cl_state( isOn() );
+    if ( hasBrightness() && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) )
+        cl_state.setBrightness( brightness() );
+    if ( hasTemperature() && ( !rclOther.hasTemperature() || rclOther.temperature() != temperature() ) )
+        cl_state.setTemperature(temperature());
+    if ( hasColor() && ( !rclOther.hasColor() || rclOther.color() != color() ) )
+        cl_state.setColor(color());
+    return cl_state;
+}
+
 void LightBulbState::updateSettingsFromJson(const QJsonObject &rclSettings)
 {
     if ( rclSettings.value("on").isBool() )

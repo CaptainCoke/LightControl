@@ -16,6 +16,7 @@ public:
 
 protected slots:
     void setLightBrightness();
+    void setOn(bool bOn);
 
 protected:
     void createGui() override;

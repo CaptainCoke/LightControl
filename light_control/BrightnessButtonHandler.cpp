@@ -11,8 +11,10 @@ void BrightnessButtonHandler::workOn(LightGroup &rclGroup)
 {
     if ( rclGroup.anyOn() )
     {
+        float f_transition_time_secs = 0.5f;
+
         qDebug() << "changing brightness of group" << rclGroup.name() << "by" << m_iBrightnessStep;
         for ( const auto &pcl_light : rclGroup.lights() )
-            pcl_light->setBrightness(std::max(1,std::min(255,pcl_light->brightness()+m_iBrightnessStep)));
+            pcl_light->setBrightness(std::max(1,std::min(255,pcl_light->brightness()+m_iBrightnessStep)),f_transition_time_secs);
     }
 }

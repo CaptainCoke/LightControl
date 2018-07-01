@@ -2,6 +2,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QtDebug>
 #include "LightBulbState.h"
 #include "LightGroup.h"
 #include "GatewayAccess.h"
@@ -48,16 +49,17 @@ bool LightGroupScene::isActive()
 
 void LightGroupScene::enforce()
 {
+    QDateTime when = QDateTime::currentDateTime().addMSecs( m_fTransitionTimeS * 1000.f );
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
-        LightBulb::get( str_light )->setTargetState( rcl_state );
+        LightBulb::get( str_light )->setTargetState( rcl_state, when );
     }
 }
 
 void LightGroupScene::apply()
 {
     GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
-        enforce();
+        //enforce();
         emit sceneApplied();
     });
 }
@@ -85,11 +87,19 @@ void LightGroupScene::setSceneData(const QJsonObject &rclObject)
 {
     m_strName = rclObject.value("name").toString();
     m_mapLightStates.clear();
+    m_fTransitionTimeS = -1;
     for ( const QJsonValueRef& rcl_light : rclObject.value("lights").toArray() )
     {
         QJsonObject cl_light_settings = rcl_light.toObject();
-        m_mapLightStates.insert_or_assign( cl_light_settings.value("id").toString(), LightBulbState::fromSceneSettings( cl_light_settings ) );
+        QString str_light_id = cl_light_settings.value("id").toString();
+        m_mapLightStates.insert_or_assign( str_light_id, LightBulbState::fromSceneSettings( cl_light_settings ) );
+        float f_light_transition_time = static_cast<float>(cl_light_settings.value("transitiontime").toDouble()) / 10.0f;
+        if ( m_fTransitionTimeS < 0 )
+            m_fTransitionTimeS = f_light_transition_time;
+        else if ( m_fTransitionTimeS != f_light_transition_time )
+            qWarning() << name() << "transition time of light" << str_light_id << "differs from first found tranisition time";
     }
+    m_fTransitionTimeS = std::max(0.f,m_fTransitionTimeS);
     emit settingsRefreshed();
 
     if  ( isActive() )

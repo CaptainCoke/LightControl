@@ -30,10 +30,10 @@ public:
     LightColor color() const;
     LightTemperature temperature() const;
 
-    void setOn( bool bOn );
-    void setBrightness( uint8_t uiBrightness );
-    void setColor( LightColor clColor );
-    void setTemperature( LightTemperature clTemperature );
+    LightBulbState& setOn( bool bOn );
+    LightBulbState& setBrightness( uint8_t uiBrightness );
+    LightBulbState& setColor( LightColor clColor );
+    LightBulbState& setTemperature( LightTemperature clTemperature );
 
     bool operator==( const LightBulbState& rclOther ) const;
     bool operator!=( const LightBulbState& rclOther ) const;

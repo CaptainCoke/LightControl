@@ -5,9 +5,8 @@
 
 void RGBLightBulb::setColor( LightColor clColor, float fTransitionTimeS)
 {
-    getTargetState().setColor( std::move(clColor) );
-    if ( getTargetState() != getCurrentState() )
-        changeToState( getTargetState(), fTransitionTimeS );
+    setTargetState( LightBulbState( getTargetState() ).setColor(std::move(clColor) ), fTransitionTimeS );
+    checkAndEnforceTargetState();
 }
 
 

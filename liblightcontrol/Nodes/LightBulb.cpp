@@ -13,7 +13,7 @@ LightBulb::LightBulb(const QString& strId)
 , m_pclCurrentState( std::make_unique<LightBulbState>(false) )
 {
     connect( this, &DeviceNode::changeStateConfirmed, this, &Node::refreshNode );
-    connect( this, &Node::stateChanged, [this]{ qDebug() << name() << "is now" << getCurrentState(); } );
+    connect( this, &Node::stateChanged, this, &LightBulb::checkAndEnforceTargetState );
 }
 
 LightBulb::~LightBulb() = default;
@@ -36,10 +36,22 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
     DeviceNode::setNodeData( rclObject );
     if ( setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
+
+}
+
+void LightBulb::checkAndEnforceTargetState()
+{
     if ( getTargetState() != getCurrentState() )
     {
-        qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "--> enforcing target state";
-        changeToState( getTargetState() );
+        float f_transition_time = 0.f;
+        if ( m_clTargetStateTimepoint.isValid() )
+            f_transition_time = std::max(0.0f,QDateTime::currentDateTime().msecsTo( m_clTargetStateTimepoint ) / 1000.0f);
+        qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "\nenforcing target state in" << f_transition_time << "seconds";
+        changeToState( getTargetState(), f_transition_time );
+    }
+    else
+    {
+         qDebug() << name() << "is now" << getCurrentState() << "(as it should be)";
     }
 }
 
@@ -103,29 +115,29 @@ const LightBulbState& LightBulb::getTargetState() const
         return *m_pclCurrentState;
 }
 
-LightBulbState& LightBulb::getTargetState()
+void LightBulb::setOn( bool bOn, float fTransitionTimeS )
 {
-    if ( !m_pclTargetState )
-        m_pclTargetState = std::make_unique<LightBulbState>( getCurrentState() );
-    return *m_pclTargetState;
-}
-
-void LightBulb::setOn( bool bOn )
-{
-    getTargetState().setOn(bOn);
-    if ( getTargetState() != getCurrentState() )
-        changeToState( getTargetState() );
+    setTargetState( LightBulbState( getTargetState() ).setOn(bOn), fTransitionTimeS );
+    checkAndEnforceTargetState();
 }
 
 void LightBulb::setBrightness(uint8_t uiBrightness, float fTransitionTimeS )
 {
-    getTargetState().setBrightness(uiBrightness);
-    if ( getTargetState() != getCurrentState() )
-        changeToState( getTargetState(), fTransitionTimeS );
+    setTargetState( LightBulbState( getTargetState() ).setBrightness(uiBrightness), fTransitionTimeS );
+    checkAndEnforceTargetState();
 }
 
-void LightBulb::setTargetState(const LightBulbState &rclState)
+void LightBulb::setTargetState(const LightBulbState &rclState, const QDateTime& rclWhen)
 {
-    qDebug() << name() << "should be" << rclState;
-    getTargetState() = rclState;
+    qDebug() << name() << "should be" << rclState << "in" << QDateTime::currentDateTime().msecsTo( rclWhen ) << "milliseconds";
+    if ( !m_pclTargetState )
+        m_pclTargetState = std::make_unique<LightBulbState>( rclState );
+    else
+        *m_pclTargetState = rclState;
+    m_clTargetStateTimepoint = rclWhen;
+}
+
+void LightBulb::setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture )
+{
+    setTargetState( rclState, QDateTime::currentDateTime().addMSecs( fSecondsInTheFuture * 1000.f ) );
 }

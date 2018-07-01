@@ -4,6 +4,7 @@
 #include "DeviceNode.h"
 #include "NodeFactory.h"
 #include <functional>
+#include <QDateTime>
 
 class LightBulbState;
 
@@ -26,9 +27,13 @@ public:
     const LightBulbState& getTargetState() const;
 
 public slots:
-    void setOn( bool bOn );
+    void setOn( bool bOn, float fTransitionTimeS = 0.f );
     void setBrightness( uint8_t uiBrightness, float fTransitionTimeS = 0.f );
-    void setTargetState( const LightBulbState& rclState );
+    void setTargetState( const LightBulbState& rclState, const QDateTime& rclWhen );
+    void setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture );
+
+protected slots:
+    void checkAndEnforceTargetState();
 
 protected:
     LightBulb(const QString& strId);
@@ -40,10 +45,10 @@ protected:
     static std::shared_ptr<LightBulb> createNode(const QString& strId, const QJsonObject &rclObject);
 
     LightBulbState& getCurrentState();
-    LightBulbState& getTargetState();
 
 private:
     std::unique_ptr<LightBulbState> m_pclCurrentState, m_pclTargetState;
+    QDateTime m_clTargetStateTimepoint; //< the timepoint when on the target state is supposed to be reached
 };
 
 #endif // LIGHTBULB_H

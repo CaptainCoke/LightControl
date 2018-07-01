@@ -51,26 +51,30 @@ LightTemperature LightBulbState::temperature() const
     return m_clTemperature.value();
 }
 
-void LightBulbState::setOn(bool bOn)
+LightBulbState& LightBulbState::setOn(bool bOn)
 {
     m_bOn = bOn;
+    return *this;
 }
 
-void LightBulbState::setBrightness( uint8_t uiBrightness )
+LightBulbState& LightBulbState::setBrightness( uint8_t uiBrightness )
 {
     m_uiBrightness = uiBrightness;
+    return *this;
 }
 
-void LightBulbState::setColor( LightColor clColor )
+LightBulbState& LightBulbState::setColor( LightColor clColor )
 {
     m_clColor = clColor;
     m_clTemperature.reset();
+    return *this;
 }
 
-void LightBulbState::setTemperature( LightTemperature clTemperature )
+LightBulbState& LightBulbState::setTemperature( LightTemperature clTemperature )
 {
     m_clTemperature = clTemperature;
     m_clColor.reset();
+    return *this;
 }
 
 bool LightBulbState::operator==(const LightBulbState &rclOther) const

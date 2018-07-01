@@ -16,8 +16,12 @@ void PowerButtonHandler::workOn(LightGroup& rclGroup)
     }
     else
     {
+        float f_transition_time_secs = 1.f;
+        if ( pcl_current_scene )
+            f_transition_time_secs = std::min(1.f,pcl_current_scene->getTransitionTime());
+
         qDebug() << "switching all lights of group" << rclGroup.name() << (b_turn_all_lights_on ? "on" : "off");
         for ( const auto &pcl_light : rclGroup.lights() )
-            pcl_light->setOn(b_turn_all_lights_on);
+            pcl_light->setOn(b_turn_all_lights_on,f_transition_time_secs);
     }
 }

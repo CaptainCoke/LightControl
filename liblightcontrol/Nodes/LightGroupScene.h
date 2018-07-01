@@ -17,6 +17,7 @@ public:
     bool updateName( const QString& strName );
     const QString& id() const { return m_strId; }
     const QString& name() const { return m_strName; }
+    float getTransitionTime() const { return m_fTransitionTimeS; }
 
     const std::map<QString,LightBulbState>& getStates();
 
@@ -39,6 +40,7 @@ protected:
 private:
     QString m_strGroupId, m_strId, m_strName;
     std::map<QString,LightBulbState> m_mapLightStates;
+    float m_fTransitionTimeS = 0.f;
 };
 
 #endif // LIGHTGROUPSCENE_H

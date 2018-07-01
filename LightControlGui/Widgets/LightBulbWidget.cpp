@@ -22,7 +22,7 @@ void LightBulbWidget::createGui()
     auto pcl_light = getNode<LightBulb>();
 
     m_pclOnCheck = new QCheckBox("On", this);
-    connect( m_pclOnCheck, &QCheckBox::toggled, pcl_light.get(), &LightBulb::setOn );
+    connect( m_pclOnCheck, &QCheckBox::toggled, this, &LightBulbWidget::setOn );
     addControl( "", m_pclOnCheck );
 
     m_pclBrightnessSlider = new QSlider(Qt::Horizontal,this);
@@ -54,6 +54,13 @@ void LightBulbWidget::setLightBrightness()
     auto pcl_light = getNode<LightBulb>();
     if ( pcl_light )
         pcl_light->setBrightness( static_cast<uint8_t>(m_pclBrightnessSlider->value()) );
+}
+
+void LightBulbWidget::setOn(bool bOn)
+{
+    auto pcl_light = getNode<LightBulb>();
+    if ( pcl_light )
+        pcl_light->setOn( bOn );
 }
 
 LightBulbWidget* LightBulbWidget::createWidget(const std::shared_ptr<LightBulb>& pclLight)

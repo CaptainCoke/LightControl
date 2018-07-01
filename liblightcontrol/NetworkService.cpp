@@ -117,7 +117,7 @@ static bool updateNodes(const QJsonObject& mapNodeData)
 
 void NetworkService::refreshLightNodes()
 {
-    GatewayAccess::instance().get( "lights", [this](const QJsonObject& rclObject){
+    GatewayAccess::instance().get( LightBulb::node_type, [this](const QJsonObject& rclObject){
         if ( updateNodes<LightBulb>( rclObject ) )
             emit lightsChanged();
     });
@@ -125,7 +125,7 @@ void NetworkService::refreshLightNodes()
 
 void NetworkService::refreshGroupNodes()
 {
-    GatewayAccess::instance().get( "groups", [this](const QJsonObject& rclObject){
+    GatewayAccess::instance().get( LightGroup::node_type, [this](const QJsonObject& rclObject){
         updateNodes<LightGroup>( rclObject );
     });
 }
@@ -133,7 +133,7 @@ void NetworkService::refreshGroupNodes()
 
 void NetworkService::updateFullState(const QJsonObject& mapState)
 {
-    updateNodes<LightBulb>( mapState.value("lights").toObject() );
-    updateNodes<Sensor>( mapState.value("sensors").toObject() );
-    updateNodes<LightGroup>( mapState.value("groups").toObject() );
+    updateNodes<LightBulb>( mapState.value(LightBulb::node_type).toObject() );
+    updateNodes<Sensor>( mapState.value(Sensor::node_type).toObject() );
+    updateNodes<LightGroup>( mapState.value(LightGroup::node_type).toObject() );
 }

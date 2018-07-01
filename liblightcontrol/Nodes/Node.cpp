@@ -19,12 +19,12 @@ void Node::setNodeData(const QJsonObject &rclObject)
 
 void Node::refreshNode()
 {
-    GatewayAccess::instance().get(nodeType()+"s/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);}, m_strEtag);
+    GatewayAccess::instance().get(nodeType()+"/"+id(), [this](const QJsonObject& rclObject){setNodeData(rclObject);}, m_strEtag);
 }
 
 void Node::deleteNode()
 {
-    GatewayAccess::instance().del(nodeType()+"s/"+id(),[this]{ Q_EMIT nodeDeleted(uniqueId()); });
+    GatewayAccess::instance().del(nodeType()+"/"+id(),[this]{ Q_EMIT nodeDeleted(uniqueId()); });
 }
 
 void Node::refreshPeriodically( uint32_t uiMilliseconds )

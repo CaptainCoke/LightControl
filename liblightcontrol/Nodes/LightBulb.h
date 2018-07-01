@@ -12,13 +12,14 @@ class LightBulb : public DeviceNode, public NodeFactory<LightBulb>
     Q_OBJECT
 public:
     ~LightBulb() override;
+    static const QString node_type;
 
     bool isOn() const;
     uint8_t brightness() const;
 
     void setNodeData(const QJsonObject &rclObject) override;
 
-    QString nodeType() const override;
+    const QString& nodeType() const override;
 
     const LightBulbState& getCurrentState() const;
     const LightBulbState& getTargetState() const;

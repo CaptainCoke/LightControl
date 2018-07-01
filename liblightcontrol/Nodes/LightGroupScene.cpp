@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include "LightBulbState.h"
+#include "LightGroup.h"
 #include "GatewayAccess.h"
 #include "LightBulb.h"
 
@@ -28,7 +29,7 @@ LightGroupScene::~LightGroupScene() = default;
 
 void LightGroupScene::refreshSettings()
 {
-    GatewayAccess::instance().get("groups/"+m_strGroupId+"/scenes/"+id(), [this](const QJsonObject& rclObject){setSceneData(rclObject);});
+    GatewayAccess::instance().get(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id(), [this](const QJsonObject& rclObject){setSceneData(rclObject);});
 }
 
 bool LightGroupScene::isActive()
@@ -47,7 +48,7 @@ bool LightGroupScene::isActive()
 
 void LightGroupScene::apply()
 {
-    GatewayAccess::instance().put("groups/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
+    GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
         for ( const auto &[str_light, rcl_state] : m_mapLightStates )
         {
             LightBulb::get( str_light )->setTargetState( rcl_state );
@@ -61,7 +62,7 @@ void LightGroupScene::save()
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
         QJsonObject cl_object = rcl_state.toJson();
-        GatewayAccess::instance().put("groups/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
+        GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
     }
 }
 

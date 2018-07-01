@@ -6,6 +6,8 @@
 #include "LightGroupScene.h"
 #include "LightBulbState.h"
 
+const QString LightGroup::node_type{"groups"};
+
 LightGroup::~LightGroup() = default;
 
 std::list<std::shared_ptr<LightBulb>> LightGroup::lights() const
@@ -65,9 +67,9 @@ std::shared_ptr<LightGroup> LightGroup::createNode(const QString &strId, const Q
     return std::shared_ptr<LightGroup>( new LightGroup(strId) );
 }
 
-QString LightGroup::nodeType() const
+const QString& LightGroup::nodeType() const
 {
-    return "group";
+    return node_type;
 }
 
 bool LightGroup::isEmpty() const

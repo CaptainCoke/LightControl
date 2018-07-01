@@ -2,6 +2,8 @@
 #include <QJsonObject>
 #include "RemoteControl.h"
 
+const QString Sensor::node_type{"sensors"};
+
 Sensor::~Sensor() = default;
 
 void Sensor::setNodeData(const QJsonObject &rclObject)
@@ -21,9 +23,9 @@ std::shared_ptr<Sensor> Sensor::createNode(const QString& strId, const QJsonObje
     return pcl_sensor;
 }
 
-QString Sensor::nodeType() const
+const QString& Sensor::nodeType() const
 {
-    return "sensor";
+    return node_type;
 }
 
 bool Sensor::setConfigData(const QJsonObject &rclObject)

@@ -11,6 +11,7 @@ class LightGroup : public Node, public NodeFactory<LightGroup>
 {
 public:
     ~LightGroup() override;
+    static const QString node_type;
 
     bool allOn() const;
     bool anyOn() const;
@@ -19,7 +20,7 @@ public:
 
     void setNodeData(const QJsonObject &rclObject) override;
 
-    QString nodeType() const override;
+    const QString& nodeType() const override;
     bool isEmpty() const override;
 
     std::shared_ptr<LightGroupScene> getCurrentScene() const;

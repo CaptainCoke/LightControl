@@ -7,6 +7,8 @@
 class Sensor : public DeviceNode, public NodeFactory<Sensor>
 {
 public:
+    static const QString node_type;
+
     ~Sensor() override;
 
     bool isOn() const { return m_bOn; }
@@ -14,7 +16,7 @@ public:
 
     void setNodeData(const QJsonObject &rclObject) override;
 
-    QString nodeType() const override;
+    const QString& nodeType() const override;
 
 protected:
     using DeviceNode::DeviceNode;

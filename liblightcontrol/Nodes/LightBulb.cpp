@@ -5,6 +5,7 @@
 #include "CTLightBulb.h"
 #include "LightBulbState.h"
 
+const QString LightBulb::node_type{"lights"};
 
 LightBulb::LightBulb(const QString& strId)
 : DeviceNode(strId)
@@ -60,9 +61,9 @@ std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJs
     return pcl_light;
 }
 
-QString LightBulb::nodeType() const
+const QString& LightBulb::nodeType() const
 {
-    return "light";
+    return node_type;
 }
 
 void LightBulb::changeToState(const LightBulbState &rclState, float fTransitionTimeSeconds )

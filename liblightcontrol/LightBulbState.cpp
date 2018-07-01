@@ -114,9 +114,17 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
     QJsonValue cl_color_mode = rclSettings.value("colormode");
     if ( !cl_color_mode.isUndefined() )
     {
-        if ( cl_color_mode.toString() == "ct" )
+        QString str_color_mode = cl_color_mode.toString();
+
+        // with Ikea Lights, colormode does not seem to be a good indicator... rather look for "xy" or "hue" attributes
+        if ( rclSettings.value("xy").isArray() )
+            str_color_mode = "xy";
+        else if ( rclSettings.value("hue").isString() )
+            str_color_mode = "hs";
+
+        if ( str_color_mode == "ct" )
             cl_state.setTemperature( LightTemperature::fromMired( rclSettings.value("ct").toInt() ) );
-        else if ( cl_color_mode.toString() == "xy" )
+        else if ( str_color_mode == "xy" )
         {
             QJsonArray cl_xy = rclSettings.value("xy").toArray();
             if ( cl_xy.isEmpty() )
@@ -128,7 +136,7 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
                     cl_xy[0].toDouble(),
                     cl_xy[1].toDouble() ) );
         }
-        else if ( cl_color_mode.toString() == "hs" )
+        else if ( str_color_mode == "hs" )
             cl_state.setColor( LightColor::fromHSV(
                 static_cast<int>((rclSettings.value("hue").toDouble() / 65535)*360),
                 static_cast<uint8_t>(rclSettings.value("sat").toInt()),
@@ -145,9 +153,30 @@ QJsonObject LightBulbState::toJson() const
     if ( hasBrightness() )
         cl_object.insert( "bri", static_cast<int>(brightness()) );
     if ( hasTemperature() )
+    {
+        cl_object.insert("colormode", "ct");
         cl_object.insert( "ct", static_cast<int>(temperature().mired()) );
+    }
     if ( hasColor() )
-        cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
-
+    {
+        cl_object.insert("colormode", "xy");
+        //cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
+        cl_object.insert( "x", color().x() );
+        cl_object.insert( "y", color().y() );
+    }
     return cl_object;
+}
+
+QDebug &operator<<(QDebug &rclStream, const LightBulbState &rclState)
+{
+    QDebugStateSaver saver(rclStream);
+    rclStream.nospace() << "{"<< (rclState.isOn() ? "on" : "off");
+    if ( rclState.hasBrightness() )
+        rclStream << ";bri:" << rclState.brightness();
+    if ( rclState.hasTemperature() )
+        rclStream << ";ct:" << rclState.temperature().mired();
+    if ( rclState.hasColor() )
+        rclStream << ";xy:" << rclState.color().x() << "," << rclState.color().y();
+    rclStream << "}";
+    return rclStream;
 }

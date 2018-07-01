@@ -1,6 +1,7 @@
 #include "LightBulb.h"
 #include <QJsonObject>
 #include <QNetworkRequest>
+#include <QtDebug>
 #include "RGBLightBulb.h"
 #include "CTLightBulb.h"
 #include "LightBulbState.h"
@@ -12,6 +13,7 @@ LightBulb::LightBulb(const QString& strId)
 , m_pclCurrentState( std::make_unique<LightBulbState>(false) )
 {
     connect( this, &DeviceNode::changeStateConfirmed, this, &Node::refreshNode );
+    connect( this, &Node::stateChanged, [this]{ qDebug() << name() << "is now" << getCurrentState(); } );
 }
 
 LightBulb::~LightBulb() = default;
@@ -35,7 +37,10 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
     if ( setStateData( rclObject.value("state").toObject() ) )
          emit stateChanged();
     if ( getTargetState() != getCurrentState() )
+    {
+        qDebug() << name() << "should be" << getTargetState() << "but is" << getCurrentState() << "--> enforcing target state";
         changeToState( getTargetState() );
+    }
     refreshPeriodically(1000);
 }
 
@@ -112,5 +117,6 @@ void LightBulb::setBrightness(uint8_t uiBrightness, float fTransitionTimeS )
 
 void LightBulb::setTargetState(const LightBulbState &rclState)
 {
+    qDebug() << name() << "should be" << rclState;
     getTargetState() = rclState;
 }

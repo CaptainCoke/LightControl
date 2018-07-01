@@ -2,6 +2,39 @@
 #include <QJsonObject>
 #include <QtDebug>
 
+QDebug& operator<<(QDebug& rclStream, const RemoteControl::Button eButton )
+{
+    static const std::map<RemoteControl::Button, QString> map_buttons {
+        {RemoteControl::Button::Power, "Power"},
+        {RemoteControl::Button::Brighter, "Brighter"},
+        {RemoteControl::Button::Dimmer, "Dimmer"},
+        {RemoteControl::Button::Previous, "Previous"},
+        {RemoteControl::Button::Next, "Next"}
+    };
+    if ( auto it_button = map_buttons.find( eButton ); it_button != map_buttons.end() )
+        rclStream << it_button->second;
+    else
+        rclStream << "\"unknown button\"";
+    return rclStream;
+}
+
+QDebug& operator<<(QDebug& rclStream, const RemoteControl::Action eAction )
+{
+    static const std::map<RemoteControl::Action, QString> map_actions {
+        {RemoteControl::Action::Holding, "held"},
+        {RemoteControl::Action::Pressed, "pressed"},
+        {RemoteControl::Action::Released, "released"},
+    };
+    QDebugStateSaver saver(rclStream);
+    rclStream.noquote();
+    if ( auto it_action = map_actions.find( eAction ); it_action != map_actions.end() )
+        rclStream << it_action->second;
+    else
+        rclStream << "\"unknown action\"";
+    return rclStream;
+}
+
+
 bool RemoteControl::isRemoteControl(const QJsonObject &rclObject)
 {
     if ( rclObject.value("type").toString() == "ZHASwitch" )
@@ -65,7 +98,7 @@ bool RemoteControl::signalButtonEvent(int iButtonEvent)
     bool b_changed = iButtonEvent == m_iButtonEvent;
     m_iButtonEvent = iButtonEvent;
 
-    qDebug() << "button event" << iButtonEvent << secondsSinceLastUpdate() << "seconds ago";
+    qDebug() << name() << "button" << button() << action() << secondsSinceLastUpdate() << "seconds ago";
 
     if ( secondsSinceLastUpdate() < 1 )
     {

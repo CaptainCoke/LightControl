@@ -1,5 +1,6 @@
 #include "Sensor.h"
 #include <QJsonObject>
+#include <QtDebug>
 #include "RemoteControl.h"
 
 const QString Sensor::node_type{"sensors"};
@@ -15,8 +16,18 @@ void Sensor::setNodeData(const QJsonObject &rclObject)
 
 void Sensor::handlePushUpdate(const QJsonObject &rclObject)
 {
-    if ( setStateData( rclObject.value("state").toObject() ) )
-        emit stateChanged();
+    if ( QJsonObject cl_state = rclObject.value("state").toObject(); !cl_state.isEmpty() )
+    {
+        if ( setStateData( cl_state ) )
+            emit stateChanged();
+    }
+    else if ( QJsonObject cl_config = rclObject.value("config").toObject(); !cl_config.isEmpty() )
+    {
+        if ( setConfigData( cl_config ) )
+            emit stateChanged();
+    }
+    else
+        qDebug() << name() << rclObject;
 }
 
 std::shared_ptr<Sensor> Sensor::createNode(const QString& strId, const QJsonObject &rclObject)

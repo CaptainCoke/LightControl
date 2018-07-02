@@ -42,7 +42,7 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
 void LightBulb::checkAndEnforceTargetState()
 {
     if ( getTargetState() != getCurrentState() )
-    {
+    {            
         float f_transition_time = 0.f;
         if ( m_clTargetStateTimepoint.isValid() )
             f_transition_time = std::max(0.0f,QDateTime::currentDateTime().msecsTo( m_clTargetStateTimepoint ) / 1000.0f);
@@ -52,7 +52,8 @@ void LightBulb::checkAndEnforceTargetState()
     }
     else
     {
-         qDebug() << name() << "is now" << getCurrentState() << "(as it should be)";
+        qDebug() << name() << "is now" << getCurrentState() << "(should be" << getTargetState() << ")";
+        m_bTargetStateReached = true;
     }
 }
 
@@ -69,11 +70,16 @@ bool LightBulb::setStateData(const QJsonObject &rclObject)
 void LightBulb::handlePushUpdate(const QJsonObject &rclObject)
 {
     LightBulbState cl_new_state = getCurrentState();
-    cl_new_state.updateSettingsFromJson( rclObject );
+    cl_new_state.updateSettingsFromJson( rclObject.value("state").toObject() );
     bool b_changed = cl_new_state != getCurrentState();
     getCurrentState() = std::move( cl_new_state );
     if ( b_changed )
+    {
+        // the push update changed the state, but we alread reached our previous target... must be user input from different source
+        if ( m_bTargetStateReached )
+            setTargetState( getCurrentState(), 0.f );
         emit stateChanged();
+    }
 }
 
 std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJsonObject &rclObject)
@@ -136,6 +142,7 @@ void LightBulb::setTargetState(const LightBulbState &rclState, const QDateTime& 
     else
         *m_pclTargetState = rclState;
     m_clTargetStateTimepoint = rclWhen;
+    m_bTargetStateReached = false;
 }
 
 void LightBulb::setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture )

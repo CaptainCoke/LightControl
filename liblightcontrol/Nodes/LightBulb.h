@@ -49,6 +49,7 @@ protected:
 private:
     std::unique_ptr<LightBulbState> m_pclCurrentState, m_pclTargetState;
     QDateTime m_clTargetStateTimepoint; //< the timepoint when on the target state is supposed to be reached
+    bool m_bTargetStateReached = false; //< whether the target state was already reached
 };
 
 #endif // LIGHTBULB_H

@@ -3,6 +3,7 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QDoubleSpinBox>
 #include <LightBulbState.h>
 #include <Nodes/LightBulb.h>
 #include "LightTemperature.h"
@@ -43,6 +44,16 @@ void LightGroupSceneWidget::setScene(std::shared_ptr<LightGroupScene> pclScene)
         pcl_layout->addWidget( pcl_pick_button, i_row+1, 0, 1, 1 );
         i_row+=2;
     }
+    QDoubleSpinBox* pcl_spin_box = new QDoubleSpinBox();
+    pcl_spin_box->setMinimum( 0 );
+    pcl_spin_box->setMaximum( std::numeric_limits<double>::max() );
+    pcl_spin_box->setValue( pclScene->getTransitionTime() );
+    pcl_spin_box->setSuffix("s");
+    connect(pcl_spin_box, QOverload<double>::of(&QDoubleSpinBox::valueChanged), pclScene.get(), &LightGroupScene::setTransitionTime );
+    pcl_layout->addWidget( new QLabel("transition"), i_row, 0, 1, 1 );
+    pcl_layout->addWidget( pcl_spin_box, i_row, 1, 1, 1 );
+    i_row++;
+
     QPushButton* pcl_reset_btn = new QPushButton("reset");
     connect( pcl_reset_btn, &QPushButton::clicked, pclScene.get(), &LightGroupScene::refreshSettings );
     pcl_layout->addWidget( pcl_reset_btn, i_row, 0, 1, 1 );

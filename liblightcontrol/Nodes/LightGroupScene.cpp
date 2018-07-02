@@ -47,6 +47,11 @@ bool LightGroupScene::isActive()
     return true;
 }
 
+void LightGroupScene::setTransitionTime(double fTransitionTimeS)
+{
+    m_fTransitionTimeS = fTransitionTimeS;
+}
+
 void LightGroupScene::enforce()
 {
     QDateTime when = QDateTime::currentDateTime().addMSecs( m_fTransitionTimeS * 1000.f );
@@ -69,6 +74,7 @@ void LightGroupScene::save()
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
         QJsonObject cl_object = rcl_state.toJson();
+        cl_object.insert( "transitiontime", QJsonValue( static_cast<double>(m_fTransitionTimeS*10.f) ) );
         GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
     }
 }

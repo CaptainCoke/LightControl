@@ -24,6 +24,7 @@ public:
     bool isActive();
 
 public slots:
+    void setTransitionTime( double fTransitionTimeS );
     void enforce();
     void apply();
     void save();

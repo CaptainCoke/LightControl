@@ -13,7 +13,7 @@ class LightBulb;
 class LightBulbState
 {
 public:
-    LightBulbState( bool bOn );
+    LightBulbState();
     ~LightBulbState();
 
     LightBulbState(const LightBulbState&);
@@ -22,10 +22,11 @@ public:
     LightBulbState& operator=(const LightBulbState&);
     LightBulbState& operator=(LightBulbState&&);
 
-    bool isOn() const;
+    bool hasOn() const;
     bool hasBrightness() const;
     bool hasColor() const;
     bool hasTemperature() const;
+    bool on() const;
     uint8_t brightness() const;
     LightColor color() const;
     LightTemperature temperature() const;
@@ -45,8 +46,10 @@ public:
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );
     QJsonObject toJson() const;
 
+    QStringList getStateAsText() const;
+
 protected:
-    bool                            m_bOn;
+    std::optional<bool>             m_bOn;
     std::optional<uint8_t>          m_uiBrightness;
     std::optional<LightColor>       m_clColor;
     std::optional<LightTemperature> m_clTemperature;

@@ -26,6 +26,10 @@ public:
     const LightBulbState& getCurrentState() const;
     const LightBulbState& getTargetState() const;
 
+signals:
+    void targetStateReached();
+    void targetStateLost();
+
 public slots:
     void setOn( bool bOn, float fTransitionTimeS = 0.f );
     void setBrightness( uint8_t uiBrightness, float fTransitionTimeS = 0.f );
@@ -33,12 +37,13 @@ public slots:
     void setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture );
 
 protected slots:
-    void checkAndEnforceTargetState();
+    void onFalseState();
 
 protected:
     LightBulb(const QString& strId);
 
-    void changeToState( const LightBulbState& rclState, float fTransitionTimeSeconds = 0.f);
+    void changeToTargetStateIfNecessary();
+    void putStateOnLightBulb( const LightBulbState& rclState, float fTransitionTimeSeconds = 0.f);
     bool setStateData(const QJsonObject &rclObject);
 
     friend class NodeFactory<LightBulb>;
@@ -46,10 +51,13 @@ protected:
 
     LightBulbState& getCurrentState();
 
+    void reactOnTargetState();
+
 private:
     std::unique_ptr<LightBulbState> m_pclCurrentState, m_pclTargetState;
     QDateTime m_clTargetStateTimepoint; //< the timepoint when on the target state is supposed to be reached
-    bool m_bTargetStateReached = false; //< whether the target state was already reached
+    bool m_bIsInTargetState = false;
+    QTimer m_clStateLostGracePeriod;
 };
 
 #endif // LIGHTBULB_H

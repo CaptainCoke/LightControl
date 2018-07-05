@@ -3,10 +3,7 @@
 #include <QJsonArray>
 #include <QDebug>
 
-LightBulbState::LightBulbState( bool bOn )
-: m_bOn(bOn)
-{
-}
+LightBulbState::LightBulbState() = default;
 
 LightBulbState::LightBulbState(const LightBulbState &) = default;
 LightBulbState::LightBulbState(LightBulbState &&) = default;
@@ -16,9 +13,9 @@ LightBulbState& LightBulbState::operator=(LightBulbState &&) = default;
 LightBulbState::~LightBulbState() = default;
 
 
-bool LightBulbState::isOn() const
+bool LightBulbState::hasOn() const
 {
-    return m_bOn;
+    return m_bOn.has_value();
 }
 
 bool LightBulbState::hasBrightness() const
@@ -34,6 +31,11 @@ bool LightBulbState::hasColor() const
 bool LightBulbState::hasTemperature() const
 {
     return m_clTemperature.has_value();
+}
+
+bool LightBulbState::on() const
+{
+    return m_bOn.value();
 }
 
 uint8_t LightBulbState::brightness() const
@@ -79,8 +81,8 @@ LightBulbState& LightBulbState::setTemperature( LightTemperature clTemperature )
 
 bool LightBulbState::operator==(const LightBulbState &rclOther) const
 {
-    if ( isOn() != rclOther.isOn() ) return false;
-    if ( !isOn() ) // off is always the same as off...
+    if ( hasOn() && ( !rclOther.hasOn() || on() != rclOther.on() ) ) return false;
+    if ( hasOn() && !on() ) // special case: off is always the same as off, regardless the other settings...
         return true;
     if ( hasBrightness()  && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) ) return false;
     if ( hasTemperature() )
@@ -111,7 +113,9 @@ bool LightBulbState::operator!=(const LightBulbState &rclOther) const
 
 LightBulbState LightBulbState::operator-(const LightBulbState &rclOther) const
 {
-    LightBulbState cl_state( isOn() );
+    LightBulbState cl_state;
+    if ( hasOn() && (!rclOther.hasOn() || on() != rclOther.on()) )
+        cl_state.setOn( on() );
     if ( hasBrightness() && ( !rclOther.hasBrightness() || brightness() != rclOther.brightness() ) )
         cl_state.setBrightness( brightness() );
     if ( hasTemperature() && ( !rclOther.hasTemperature() || rclOther.temperature() != temperature() ) )
@@ -130,14 +134,30 @@ void LightBulbState::updateSettingsFromJson(const QJsonObject &rclSettings)
     if ( rclSettings.value("ct").isDouble() )
         m_clTemperature = LightTemperature::fromMired( rclSettings.value("ct").toInt() );
     if ( rclSettings.value("x").isDouble() && hasColor() )
-        m_clColor =LightColor::fromXY( rclSettings.value("x").toDouble(), color().y() );
+    {
+        double x = rclSettings.value("x").toDouble();
+        if ( x < 0 || x > 1 )
+            qWarning() << "IGNORING silly x value " << x;
+        else
+            m_clColor =LightColor::fromXY( x, color().y() );
+    }
     if ( rclSettings.value("y").isDouble() && hasColor() )
-        m_clColor =LightColor::fromXY( color().x(), rclSettings.value("y").toDouble() );
+    {
+        double y = rclSettings.value("y").toDouble();
+        if ( y < 0 || y > 1 )
+            qWarning() << "IGNORING silly y value " << y;
+        m_clColor =LightColor::fromXY( color().x(), y );
+    }
 }
 
 LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
 {
-    LightBulbState cl_state( rclSettings.value("on").toBool() );
+    LightBulbState cl_state;
+
+    QJsonValue cl_on = rclSettings.value("on");
+    if ( !cl_on.isUndefined() )
+        cl_state.setOn( rclSettings.value("on").toBool() );
+
     QJsonValue cl_bri = rclSettings.value("bri");
     if ( !cl_bri.isUndefined() )
         cl_state.setBrightness(static_cast<uint8_t>(cl_bri.toInt()));
@@ -148,9 +168,9 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
         QString str_color_mode = cl_color_mode.toString();
 
         // with Ikea Lights, colormode does not seem to be a good indicator... rather look for "xy" or "hue" attributes
-        if ( rclSettings.value("xy").isArray() )
+        if ( rclSettings.value("xy").isArray() && !rclSettings.value("xy").toArray().isEmpty() )
             str_color_mode = "xy";
-        else if ( rclSettings.value("hue").isString() )
+        else if ( rclSettings.value("hue").isString() && rclSettings.value("sat").isString() )
             str_color_mode = "hs";
 
         if ( str_color_mode == "ct" )
@@ -159,15 +179,18 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
         {
             QJsonArray cl_xy = rclSettings.value("xy").toArray();
             if ( cl_xy.isEmpty() )
-                cl_state.setColor( LightColor::fromXY(
-                    rclSettings.value("x").toDouble(),
-                    rclSettings.value("y").toDouble() ) );
-            else
+            {
+                if ( rclSettings.value("x").isDouble() && rclSettings.value("y").isDouble() )
+                    cl_state.setColor( LightColor::fromXY(
+                        rclSettings.value("x").toDouble(),
+                        rclSettings.value("y").toDouble() ) );
+            }
+            else if ( cl_xy[0].isDouble() && cl_xy[1].isDouble() )
                 cl_state.setColor( LightColor::fromXY(
                     cl_xy[0].toDouble(),
                     cl_xy[1].toDouble() ) );
         }
-        else if ( str_color_mode == "hs" )
+        else if ( str_color_mode == "hs" && rclSettings.value("hue").isDouble() && rclSettings.value("sat").isDouble() )
             cl_state.setColor( LightColor::fromHSV(
                 static_cast<int>((rclSettings.value("hue").toDouble() / 65535)*360),
                 static_cast<uint8_t>(rclSettings.value("sat").toInt()),
@@ -180,7 +203,8 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
 QJsonObject LightBulbState::toJson() const
 {
     QJsonObject cl_object;
-    cl_object.insert( "on", isOn() );
+    if ( hasOn() )
+        cl_object.insert( "on", on() );
     if ( hasBrightness() )
         cl_object.insert( "bri", static_cast<int>(brightness()) );
     if ( hasTemperature() )
@@ -198,16 +222,23 @@ QJsonObject LightBulbState::toJson() const
     return cl_object;
 }
 
+QStringList LightBulbState::getStateAsText() const
+{
+    QStringList lst_items;
+    if ( hasOn() )
+        lst_items << (on() ? "on" : "off");
+    if ( hasBrightness() )
+        lst_items << QString( "bri:%1" ).arg( brightness() );
+    if ( hasTemperature() )
+        lst_items << QString( "ct:%1" ).arg( temperature().mired() );
+    if ( hasColor() )
+        lst_items << QString("xy:%1,%2").arg( color().x() ).arg( color().y() );
+    return lst_items;
+}
+
 QDebug &operator<<(QDebug &rclStream, const LightBulbState &rclState)
 {
     QDebugStateSaver saver(rclStream);
-    rclStream.nospace() << "{"<< (rclState.isOn() ? "on" : "off");
-    if ( rclState.hasBrightness() )
-        rclStream << ";bri:" << rclState.brightness();
-    if ( rclState.hasTemperature() )
-        rclStream << ";ct:" << rclState.temperature().mired();
-    if ( rclState.hasColor() )
-        rclStream << ";xy:" << rclState.color().x() << "," << rclState.color().y();
-    rclStream << "}";
+    rclStream.nospace() << "{" << rclState.getStateAsText().join(";") << "}";
     return rclStream;
 }

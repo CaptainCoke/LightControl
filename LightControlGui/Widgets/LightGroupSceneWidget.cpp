@@ -27,20 +27,11 @@ void LightGroupSceneWidget::setScene(std::shared_ptr<LightGroupScene> pclScene)
     int i_row = 0;
     for ( const auto &[str_id, rcl_state] : pclScene->getStates() )
     {
-        QStringList lst_text;
-        lst_text << (rcl_state.isOn() ? "on" : "off");
-        if ( rcl_state.hasBrightness() )
-            lst_text << QString("bri:%1").arg( rcl_state.brightness() );
-        if ( rcl_state.hasColor() )
-            lst_text << QString("col:%1,%2").arg( rcl_state.color().x() ).arg( rcl_state.color().y() );
-        if ( rcl_state.hasTemperature() )
-            lst_text << QString("temp:%1K").arg( rcl_state.temperature().kelvin() );
-
         auto pcl_pick_button = new QPushButton("pick");
         connect( pcl_pick_button, &QPushButton::clicked, [this,str_id,pclScene]{ pclScene->pickSettings(str_id); } );
 
         pcl_layout->addWidget( new QLabel( LightBulb::get(str_id)->name() ), i_row, 0, 1, 1 );
-        pcl_layout->addWidget( new QLabel(lst_text.join("\n")), i_row, 1, 2, 1 );
+        pcl_layout->addWidget( new QLabel(rcl_state.getStateAsText().join("\n")), i_row, 1, 2, 1 );
         pcl_layout->addWidget( pcl_pick_button, i_row+1, 0, 1, 1 );
         i_row+=2;
     }

@@ -25,7 +25,7 @@ public:
 
 public slots:
     void setTransitionTime( double fTransitionTimeS );
-    void enforce();
+    void notifyLightsOfActivation();
     void apply();
     void save();
     void refreshSettings();

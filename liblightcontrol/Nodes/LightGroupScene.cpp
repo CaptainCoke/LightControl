@@ -52,7 +52,7 @@ void LightGroupScene::setTransitionTime(double fTransitionTimeS)
     m_fTransitionTimeS = fTransitionTimeS;
 }
 
-void LightGroupScene::enforce()
+void LightGroupScene::notifyLightsOfActivation()
 {
     QDateTime when = QDateTime::currentDateTime().addMSecs( m_fTransitionTimeS * 1000.f );
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
@@ -63,8 +63,8 @@ void LightGroupScene::enforce()
 
 void LightGroupScene::apply()
 {
+    notifyLightsOfActivation();
     GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/recall",{}, [this](const QJsonArray&){
-        //enforce();
         emit sceneApplied();
     });
 }

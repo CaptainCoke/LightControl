@@ -52,8 +52,8 @@ void LightGroup::handlePushUpdate(const QJsonObject &rclObject)
         auto pcl_scene = getCurrentScene();
         if ( pcl_scene )
         {
-            qDebug() << "enforcing scene" << pcl_scene->name() << "of group"<< name();
-            pcl_scene->enforce();
+            qDebug() << name() << "scene"<<pcl_scene->name()<<"called. notifying lights";
+            pcl_scene->notifyLightsOfActivation();
         }
     }
     else
@@ -78,7 +78,7 @@ bool LightGroup::allOn() const
         {
             const auto & map_states = pcl_scene->getStates();
             auto it_light_state = map_states.find( pcl_light->id() );
-            if ( it_light_state != map_states.end() && it_light_state->second.isOn() )
+            if ( it_light_state != map_states.end() && it_light_state->second.hasOn() && it_light_state->second.on() )
                 b_should_be_on = true;
             else
                 b_should_be_on = false;

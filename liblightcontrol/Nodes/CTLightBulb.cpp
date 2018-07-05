@@ -30,7 +30,7 @@ void CTLightBulb::setNodeData(const QJsonObject &rclObject)
 void CTLightBulb::setTemperature(LightTemperature clTemperature, float fTransitionTimeS)
 {
     setTargetState( LightBulbState( getTargetState() ).setTemperature( std::move(clTemperature) ), fTransitionTimeS );
-    checkAndEnforceTargetState();
+    changeToTargetStateIfNecessary();
 }
 
 void CTLightBulb::setMired(uint16_t uiMired, float fTransitionTimeS)

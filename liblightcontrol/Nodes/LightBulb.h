@@ -35,6 +35,7 @@ public slots:
     void setBrightness( uint8_t uiBrightness, float fTransitionTimeS = 0.f );
     void setTargetState( const LightBulbState& rclState, const QDateTime& rclWhen );
     void setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture );
+    void changeToTargetStateIfNecessary();
 
 protected slots:
     void onFalseState();
@@ -42,7 +43,6 @@ protected slots:
 protected:
     LightBulb(const QString& strId);
 
-    void changeToTargetStateIfNecessary();
     void putStateOnLightBulb( const LightBulbState& rclState, float fTransitionTimeSeconds = 0.f);
     bool setStateData(const QJsonObject &rclObject);
 

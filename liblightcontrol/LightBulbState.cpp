@@ -170,8 +170,12 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
         // with Ikea Lights, colormode does not seem to be a good indicator... rather look for "xy" or "hue" attributes
         if ( rclSettings.value("xy").isArray() && !rclSettings.value("xy").toArray().isEmpty() )
             str_color_mode = "xy";
+        else if ( rclSettings.value("x").isDouble() || rclSettings.value("y").isDouble() )
+            str_color_mode = "xy";
         else if ( rclSettings.value("hue").isString() && rclSettings.value("sat").isString() )
             str_color_mode = "hs";
+        else if ( rclSettings.value("ct").isDouble() )
+            str_color_mode = "ct";
 
         if ( str_color_mode == "ct" )
             cl_state.setTemperature( LightTemperature::fromMired( rclSettings.value("ct").toInt() ) );
@@ -200,7 +204,7 @@ LightBulbState LightBulbState::fromSceneSettings(const QJsonObject &rclSettings)
     return cl_state;
 }
 
-QJsonObject LightBulbState::toJson() const
+QJsonObject LightBulbState::toJson(bool bForScene) const
 {
     QJsonObject cl_object;
     if ( hasOn() )
@@ -215,9 +219,14 @@ QJsonObject LightBulbState::toJson() const
     if ( hasColor() )
     {
         cl_object.insert("colormode", "xy");
-        //cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
-        cl_object.insert( "x", color().x() );
-        cl_object.insert( "y", color().y() );
+        if ( bForScene )
+        {
+            cl_object.insert( "x", color().x() );
+            cl_object.insert( "y", color().y() );
+        }
+        else
+            cl_object.insert( "xy", QJsonArray{color().x(),color().y()} );
+
     }
     return cl_object;
 }

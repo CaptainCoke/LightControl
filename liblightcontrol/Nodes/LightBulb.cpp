@@ -53,17 +53,13 @@ void LightBulb::setNodeData(const QJsonObject &rclObject)
 
 void LightBulb::changeToTargetStateIfNecessary()
 {
-    reactOnTargetState();
-
     if ( !m_bIsInTargetState )
-    {            
-        qDebug() << name() << "currently in" << getCurrentState();
-
+    {
         float f_transition_time = 0.f;
         if ( m_clTargetStateTimepoint.isValid() )
             f_transition_time = std::max(0.0f,QDateTime::currentDateTime().msecsTo( m_clTargetStateTimepoint ) / 1000.0f);
         LightBulbState cl_diff = getTargetState() - getCurrentState();
-        qDebug() << "  --> sending diff"<< cl_diff <<"tba in" << f_transition_time << "seconds";
+        qDebug() << "currently in" << getCurrentState() << " --> sending diff"<< cl_diff <<"tba in" << f_transition_time << "seconds";
         putStateOnLightBulb( cl_diff, f_transition_time );
     }
 }
@@ -143,7 +139,7 @@ const QString& LightBulb::nodeType() const
 
 void LightBulb::putStateOnLightBulb(const LightBulbState &rclState, float fTransitionTimeSeconds )
 {
-    changeState( rclState.toJson(), fTransitionTimeSeconds );
+    changeState( rclState.toJson(false), fTransitionTimeSeconds );
 }
 
 const LightBulbState& LightBulb::getCurrentState() const
@@ -184,10 +180,8 @@ void LightBulb::setTargetState(const LightBulbState &rclState, const QDateTime& 
     else
         *m_pclTargetState = rclState;
     m_clTargetStateTimepoint = rclWhen;
-    qDebug() << name() << "target state should be"<<rclState<<"in"<<QDateTime::currentDateTime().msecsTo( rclWhen )/1000.0 << "seconds";
-
     m_bIsInTargetState = getCurrentState() == rclState;
-    reactOnTargetState();
+    qDebug() << name() << "target state"<< (m_bIsInTargetState ? "is already" : "should be") <<rclState<<"in"<<QDateTime::currentDateTime().msecsTo( rclWhen )/1000.0 << "seconds";
 }
 
 void LightBulb::setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture )

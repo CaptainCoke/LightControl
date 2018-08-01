@@ -73,7 +73,7 @@ void LightGroupScene::save()
 {
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
-        QJsonObject cl_object = rcl_state.toJson();
+        QJsonObject cl_object = rcl_state.toJson(true);
         cl_object.insert( "transitiontime", QJsonValue( static_cast<double>(m_fTransitionTimeS*10.f) ) );
         GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
     }

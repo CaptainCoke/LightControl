@@ -44,7 +44,7 @@ public:
     void updateSettingsFromJson( const QJsonObject& rclSettings );
 
     static LightBulbState fromSceneSettings( const QJsonObject& rclSettings );
-    QJsonObject toJson() const;
+    QJsonObject toJson( bool bForScene ) const;
 
     QStringList getStateAsText() const;
 

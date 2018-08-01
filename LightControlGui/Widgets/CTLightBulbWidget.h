@@ -4,6 +4,8 @@
 #include "LightBulbWidget.h"
 
 class QSlider;
+class QSpinBox;
+class QLabel;
 
 class CTLightBulbWidget : public LightBulbWidget
 {
@@ -13,6 +15,7 @@ public:
 
 protected slots:
     void setLightTemperature();
+    void updateValueFromInput(int iMired);
 
 protected:
     using LightBulbWidget::LightBulbWidget;
@@ -21,6 +24,8 @@ protected:
     void updateState() override;
 
     QSlider *m_pclTemperatureSlider;
+    QSpinBox* m_pclTemperatureSpinBox;
+    QLabel* m_pclTemperatureLabel;
 };
 
 #endif // CTLIGHTBULBWIDGET_H

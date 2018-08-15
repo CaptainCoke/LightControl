@@ -23,9 +23,12 @@ public slots:
 
 protected:
     using LightBulb::LightBulb;
+    bool isCloseEnoughToTargetState() const override;
 
 private:
+    uint8_t m_uiTemperatureImprecisionMired = 0;
     LightTemperature m_clMinTemperature = LightTemperature::fromKelvin(2700), m_clMaxTemperature = LightTemperature::fromKelvin(2700);
+    static std::map<QString,uint8_t> s_mapModelTemperatureImprecisions;
 };
 
 #endif // CTLIGHTBULB_H

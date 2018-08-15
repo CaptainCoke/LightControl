@@ -89,15 +89,15 @@ void LightBulb::handlePushUpdate(const QJsonObject &rclObject)
         emit stateChanged();
     }
     else
-        qDebug() << name() << "External push" << cl_change << ", but state remains same ("<< getCurrentState() <<")";
+        qDebug() << name() << "External push" << rclObject.value("state").toObject() << ", but state remains same ("<< getCurrentState() <<")";
 
     reactOnTargetState();
 }
 
 void LightBulb::reactOnTargetState()
 {
-    bool b_is_in_target_state = getTargetState() == getCurrentState();
-    LightBulbState cl_diff  = getTargetState() -  getCurrentState();
+    bool b_is_in_target_state = isCloseEnoughToTargetState();
+    LightBulbState cl_diff  = getTargetState() - getCurrentState();
     if ( b_is_in_target_state && m_bIsInTargetState )
         qDebug() << "  --> still in target state.";
     else if ( b_is_in_target_state && !m_bIsInTargetState )
@@ -117,6 +117,11 @@ void LightBulb::reactOnTargetState()
         m_bIsInTargetState = false;
         emit targetStateLost();
     }
+}
+
+bool LightBulb::isCloseEnoughToTargetState() const
+{
+    return getTargetState() == getCurrentState();
 }
 
 

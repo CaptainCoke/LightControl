@@ -54,6 +54,7 @@ protected:
     LightBulbState& getCurrentState();
 
     void reactOnTargetState();
+    virtual bool isCloseEnoughToTargetState() const;
 
 private:
     std::unique_ptr<LightBulbState> m_pclCurrentState, m_pclTargetState;

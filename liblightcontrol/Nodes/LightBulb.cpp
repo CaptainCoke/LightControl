@@ -139,6 +139,7 @@ const QString& LightBulb::nodeType() const
 
 void LightBulb::putStateOnLightBulb(const LightBulbState &rclState, float fTransitionTimeSeconds )
 {
+    emit targetStateChanged();
     changeState( rclState.toJson(false), fTransitionTimeSeconds );
 }
 
@@ -159,6 +160,11 @@ const LightBulbState& LightBulb::getTargetState() const
         return *m_pclTargetState;
     else
         return *m_pclCurrentState;
+}
+
+bool LightBulb::isInTargetState() const
+{
+    return m_bIsInTargetState;
 }
 
 void LightBulb::setOn( bool bOn, float fTransitionTimeS )
@@ -203,6 +209,7 @@ void LightBulb::onFalseState()
         qDebug() << "      state activation is in far past ("<<i_milliseconds_to_target_state<<"ago)";
         getCurrentState() = getTargetState();
         m_bIsInTargetState = true;
+        emit stateChanged();
     }
     else if ( i_milliseconds_to_target_state > -250 ) // we are in the first 0.25s... set a timer and wait
     {

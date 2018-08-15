@@ -14,7 +14,7 @@ public:
     ~DeviceNodeWidget() override;
 
 public slots:
-    void updateNode();
+    void updateNode() override;
     void updateState() override;
 
 protected:

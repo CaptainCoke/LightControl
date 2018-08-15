@@ -6,6 +6,7 @@
 class QSlider;
 class QCheckBox;
 class LightBulb;
+class QLabel;
 
 class LightBulbWidget : public DeviceNodeWidget
 {
@@ -21,12 +22,16 @@ protected slots:
 protected:
     void createGui() override;
     void updateState() override;
+    void setToTargetStateReached();
+    void setToTargetStateLost();
+    void setToTargetStateChanging();
 
 private:
     explicit LightBulbWidget( const std::shared_ptr<LightBulb>& pclLight, QWidget *parent = nullptr );
 
     QCheckBox *m_pclOnCheck;
     QSlider   *m_pclBrightnessSlider;
+    QLabel    *m_pclStateReachedLabel;
 };
 
 #endif // LIGHTBULBWIDGET_H

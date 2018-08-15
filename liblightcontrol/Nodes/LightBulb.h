@@ -25,10 +25,12 @@ public:
 
     const LightBulbState& getCurrentState() const;
     const LightBulbState& getTargetState() const;
+    bool isInTargetState() const;
 
 signals:
     void targetStateReached();
     void targetStateLost();
+    void targetStateChanged();
 
 public slots:
     void setOn( bool bOn, float fTransitionTimeS = 0.f );

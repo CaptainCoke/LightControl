@@ -21,6 +21,13 @@ void LightBulbWidget::createGui()
     DeviceNodeWidget::createGui();
     auto pcl_light = getNode<LightBulb>();
 
+    m_pclStateReachedLabel = new QLabel("");
+    addControl( "", m_pclStateReachedLabel );
+    connect( pcl_light.get(), &LightBulb::targetStateReached, [this]{ setToTargetStateReached(); } );
+    connect( pcl_light.get(), &LightBulb::targetStateLost, [this]{ setToTargetStateLost(); } );
+    connect( pcl_light.get(), &LightBulb::targetStateChanged, [this]{ setToTargetStateChanging(); } );
+    setToTargetStateChanging();
+
     m_pclOnCheck = new QCheckBox("On", this);
     connect( m_pclOnCheck, &QCheckBox::toggled, this, &LightBulbWidget::setOn );
     addControl( "", m_pclOnCheck );
@@ -39,14 +46,34 @@ void LightBulbWidget::createGui()
     addControl( "Brightness", pcl_brightness_layout );
 }
 
-
-
 void LightBulbWidget::updateState()
 {
     DeviceNodeWidget::updateState();
     auto pcl_light = getNode<LightBulb>();
     m_pclOnCheck->setChecked(        pcl_light->isOn() );
     m_pclBrightnessSlider->setValue( pcl_light->brightness() );
+    if ( pcl_light->isInTargetState() )
+        setToTargetStateReached();
+    else
+        setToTargetStateChanging();
+}
+
+void LightBulbWidget::setToTargetStateReached()
+{
+    m_pclStateReachedLabel->setText( "ready" );
+    m_pclStateReachedLabel->setStyleSheet( "QLabel { color: green; }" );
+}
+
+void LightBulbWidget::setToTargetStateLost()
+{
+    m_pclStateReachedLabel->setText( "lost" );
+    m_pclStateReachedLabel->setStyleSheet( "QLabel { color: red; }" );
+}
+
+void LightBulbWidget::setToTargetStateChanging()
+{
+    m_pclStateReachedLabel->setText(  "working" );
+    m_pclStateReachedLabel->setStyleSheet( "QLabel { color: orange; }" );
 }
 
 void LightBulbWidget::setLightBrightness()

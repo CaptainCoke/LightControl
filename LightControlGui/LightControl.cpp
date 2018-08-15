@@ -62,6 +62,8 @@ QStringList LightControl::updateWidget(QLayout* pclLayout)
             connect( pcl_node.get(), &Node::nodeDeleted, this, &LightControl::removeWidget );
         }
     }
+    if ( QBoxLayout* pcl_lay = dynamic_cast<QBoxLayout*>(pclLayout); pcl_lay != nullptr )
+        pcl_lay->addStretch();
     return lst_widget_ids;
 }
 

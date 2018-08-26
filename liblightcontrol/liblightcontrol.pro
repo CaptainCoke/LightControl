@@ -35,7 +35,8 @@ SOURCES += \
     Nodes/RemoteControl.cpp \
     Nodes/Node.cpp \
     Nodes/LightGroup.cpp \
-    Nodes/LightGroupScene.cpp
+    Nodes/LightGroupScene.cpp \
+    LightStateTransition.cpp
 
 HEADERS += \
     GatewayAccess.h \
@@ -53,4 +54,5 @@ HEADERS += \
     Nodes/Node.h \
     Nodes/LightGroup.h \
     Nodes/LightGroupScene.h \
-    Nodes/NodeFactory.h
+    Nodes/NodeFactory.h \
+    LightStateTransition.h

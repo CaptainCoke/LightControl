@@ -3,17 +3,21 @@
 #include <QtDebug>
 #include <QTime>
 #include <set>
+#include "Nodes/LightBulb.h"
 #include "Nodes/LightGroup.h"
 #include "Nodes/LightGroupScene.h"
 #include "NodeTools.h"
+#include "LightBulbState.h"
+#include "LightStateTransition.h"
 
 class AlarmService::Alarm
 {
 public:
-    Alarm( QString strGroupName, QString strSceneName, QTime clTime, std::set<Qt::DayOfWeek> setWeekdays )
+    Alarm( QString strGroupName, QString strSceneName, QTime clTime, double fDuration, std::set<Qt::DayOfWeek> setWeekdays )
     : m_strGroupName( std::move(strGroupName) )
     , m_strSceneName( std::move(strSceneName) )
     , m_clTime( std::move(clTime) )
+    , m_fDuration(fDuration)
     , m_setWeekdays( std::move(setWeekdays) )
     {}
 
@@ -38,12 +42,20 @@ public:
             qCritical() << "cannot activate timer for group"<<m_strGroupName<<": group not found!";
             return;
         }
-        for ( const auto &[str_id,pcl_scene] : group->scenes() )
+        for ( const auto &[str_group_id,pcl_scene] : group->scenes() )
         {
             if ( m_strSceneName.compare( pcl_scene->name(), Qt::CaseInsensitive ) == 0 )
             {
                 qInfo() << "activating scene"<<m_strSceneName<<"of group"<<m_strGroupName<<"due to alarm event at"<<m_clTime.toString("hh:mm");
-                pcl_scene->apply();
+                for ( const auto &[str_light_id,cl_state] : pcl_scene->getStates() )
+                {
+                    if ( cl_state.on() )
+                    {
+                        auto pcl_transition = std::make_shared<LightStateTransition>( LightBulb::get(str_light_id), m_fDuration );
+                        pcl_transition->start();
+                    }
+                }
+                //pcl_scene->apply();
                 return;
             }
         }
@@ -53,6 +65,7 @@ private:
     QString m_strGroupName, m_strSceneName;
     QTime m_clTime;
     QDateTime m_clLastActivated;
+    double m_fDuration;
     std::set<Qt::DayOfWeek> m_setWeekdays;
 };
 
@@ -108,6 +121,7 @@ void AlarmService::loadAlarms()
         QString str_scene_name = cl_settings.value("scene").toString();
         QString str_timepoint  = cl_settings.value("time").toString();
         QString str_weekdays   = cl_settings.value("weekdays").toString();
+        double f_duration      = cl_settings.value("duration").toDouble();
 
         QTime cl_time = QTime::fromString( str_timepoint, "hh:mm" );
         if ( !cl_time.isValid() )
@@ -118,7 +132,7 @@ void AlarmService::loadAlarms()
         std::set<Qt::DayOfWeek> set_weekdays = parseWeekdays(str_weekdays);
 
         qInfo() << "adding alarm " << str_timepoint << " for" << str_group_name << "scene" << str_scene_name << "on" << str_weekdays;
-        m_lstAlarms.emplace_back( std::move(str_group_name), std::move(str_scene_name), std::move(cl_time), std::move(set_weekdays) );
+        m_lstAlarms.emplace_back( std::move(str_group_name), std::move(str_scene_name), std::move(cl_time), f_duration, std::move(set_weekdays) );
     }
     cl_settings.endArray();
 }

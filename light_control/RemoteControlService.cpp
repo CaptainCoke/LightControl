@@ -3,11 +3,12 @@
 #include "GatewayAccess.h"
 #include "Nodes/RemoteControl.h"
 #include "Nodes/LightGroup.h"
+#include "Nodes/LightBulb.h"
 #include "NodeTools.h"
 #include "PowerButtonHandler.h"
 #include "SceneButtonHandler.h"
 #include "BrightnessButtonHandler.h"
-
+#include "LightStateTransition.h"
 
 RemoteControlService::RemoteControlService(QObject *parent)
 : QObject(parent)
@@ -32,6 +33,10 @@ void RemoteControlService::stop()
 
 void RemoteControlService::handleButtonPress( RemoteControl::Button button, LightGroup& rclGroup )
 {
+    // ensure no transition is running for the group
+    for ( const auto & pcl_light : rclGroup.lights() )
+        LightStateTransition::abortIfExists( pcl_light->id() );
+
     auto it_handler = m_mapButtonHandler.find(button);
     if ( it_handler != m_mapButtonHandler.end() )
         it_handler->second->workOn(rclGroup);

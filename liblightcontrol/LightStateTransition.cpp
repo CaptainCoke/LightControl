@@ -8,6 +8,9 @@ std::map<QString,std::shared_ptr<LightStateTransition>> LightStateTransition::s_
 LightStateTransition::LightStateTransition( std::shared_ptr<LightBulb> pclLight, double fTransitionTimeSeconds )
 : m_pclLight(std::move(pclLight)), m_fTransitionTimeSeconds(fTransitionTimeSeconds)
 {
+    m_clNextEventTimer.setSingleShot(true);
+    m_clNextEventTimer.setInterval(100);
+    QObject::connect( &m_clNextEventTimer, &QTimer::timeout, [this]{ step(); } );
 }
 
 void LightStateTransition::start()
@@ -19,17 +22,12 @@ void LightStateTransition::start()
     m_clConnection = QObject::connect( m_pclLight.get(), &LightBulb::targetStateReached, [this]{ step(); } );
     m_bFinished = false;
     m_eNextAttribute = static_cast<LightAttribute>(NUM_ATTRIBUTES-1);
-    m_clNextEventTimer.setSingleShot(true);
-    m_clNextEventTimer.setInterval(0);
-    QObject::connect( &m_clNextEventTimer, &QTimer::timeout, [this]{ setValueAtPosition(0.0); } );
     m_clNextEventTimer.start();
 }
 
 void LightStateTransition::abort()
 {
-    qInfo() << "aborted";
-    m_clNextEventTimer.stop();
-    m_clNextEventTimer.disconnect();
+    qInfo() << m_pclLight->name() << "aborted";
     cleanup();
 }
 
@@ -42,26 +40,30 @@ void LightStateTransition::abortIfExists(const QString &strLightId)
 {
     if ( auto it_light = s_mapAllLightStateTransitions.find( strLightId ); it_light != s_mapAllLightStateTransitions.end() )
     {
-        it_light->second->abort();
+        if ( !it_light->second->isFinished() )
+            it_light->second->abort();
     }
 }
 
 void LightStateTransition::step()
 {
+    m_clNextEventTimer.stop();
     double f_step_time_sec = m_tStart.msecsTo( QDateTime::currentDateTime() ) / 1000.0;
+    qInfo() << m_pclLight->name() << "step after" << f_step_time_sec << "of" << m_fTransitionTimeSeconds << "seconds";
     double f_alpha = f_step_time_sec/m_fTransitionTimeSeconds;
     setValueAtPosition(f_alpha);
 }
 
 void LightStateTransition::finish()
 {
-    qInfo() << "finished";
+    qInfo() << m_pclLight->name() << "finished";
     cleanup();
     m_bFinished = true;
 }
 
 void LightStateTransition::cleanup()
 {
+    m_clNextEventTimer.stop();
     QObject::disconnect( m_clConnection );
     if ( auto it_this = s_mapAllLightStateTransitions.find( m_pclLight->id() ); it_this != s_mapAllLightStateTransitions.end() )
     {
@@ -78,7 +80,7 @@ void LightStateTransition::setValueAtPosition( double fAlpha )
     case Power:
         if ( !m_pclLight->isOn() )
         {
-            qInfo() << fAlpha*100 << "%  --> power on";
+            qInfo() << m_pclLight->name() << fAlpha*100 << "%  --> power on";
             m_pclLight->setOn(true);
             break;
         }
@@ -88,7 +90,7 @@ void LightStateTransition::setValueAtPosition( double fAlpha )
         uint8_t brightness_step = static_cast<uint8_t>(std::clamp(m_fBrightnessStart*(1.0-fAlpha) + m_fBrightnessEnd*fAlpha, 1.0, 255.0));
         if ( m_pclLight->brightness() != brightness_step)
         {
-            qInfo() << fAlpha*100 << "%  --> brightness:" << brightness_step;
+            qInfo() << m_pclLight->name() << fAlpha*100 << "%  --> brightness:" << brightness_step;
             m_pclLight->setBrightness( brightness_step );
             break;
         }
@@ -101,13 +103,13 @@ void LightStateTransition::setValueAtPosition( double fAlpha )
         auto cl_next_color = LightColor::fromTemperature( cl_next_temperature );
         if ( auto pcl_rgb_light = std::dynamic_pointer_cast<RGBLightBulb>( m_pclLight ); pcl_rgb_light && pcl_rgb_light->color() != cl_next_color )
         {
-            qInfo() << fAlpha*100 << "%  --> color:" << mired_step << " ="<<cl_next_color.x() <<cl_next_color.y();
+            qInfo() << m_pclLight->name() << fAlpha*100 << "%  --> color:" << mired_step << " ="<<cl_next_color.x() <<cl_next_color.y();
             pcl_rgb_light->setColor( cl_next_color );
             break;
         }
         else if ( auto pcl_ct_light = std::dynamic_pointer_cast<CTLightBulb>( m_pclLight ); pcl_ct_light && pcl_ct_light->temperature() != cl_next_temperature )
         {
-            qInfo() << fAlpha*100 << "%  --> temperature:" << mired_step << " = "<<cl_next_temperature.kelvin() << "K";
+            qInfo() << m_pclLight->name() << fAlpha*100 << "%  --> temperature:" << mired_step << " = "<<cl_next_temperature.kelvin() << "K";
             pcl_ct_light->setTemperature( cl_next_temperature );
             break;
         }
@@ -118,11 +120,8 @@ void LightStateTransition::setValueAtPosition( double fAlpha )
             finish();
         else // apparently we are alreay in the state for this position... set a timer to try again later
         {
-            m_clNextEventTimer.setSingleShot(true);
-            m_clNextEventTimer.setInterval(50);
-            QObject::connect( &m_clNextEventTimer, &QTimer::timeout, [this]{ step(); } );
+            qInfo() << fAlpha*100 << "% --> all values already as intended... setting timer";
             m_clNextEventTimer.start();
-            qInfo() << fAlpha*100 << "% --> all values already as inteded... setting timer";
         }
     }
 }

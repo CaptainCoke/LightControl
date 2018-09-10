@@ -9,6 +9,7 @@ class LightGroupScene;
 
 class LightGroup : public Node, public NodeFactory<LightGroup>
 {
+    Q_OBJECT
 public:
     ~LightGroup() override;
     static const QString node_type;
@@ -27,6 +28,9 @@ public:
     std::shared_ptr<LightGroupScene> getCurrentScene() const;
     std::shared_ptr<LightGroupScene> getNextScene() const;
     std::shared_ptr<LightGroupScene> getPreviousScene() const;
+
+signals:
+    void sceneCalled(const QString& strCalledSceneId); //< signals if a scene of this group was called
 
 public slots:
     void setNextScene();

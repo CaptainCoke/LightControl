@@ -47,6 +47,7 @@ void LightGroup::handlePushUpdate(const QJsonObject &rclObject)
     {
         QString str_scene_id = rclObject.value("scid").toString();
         setCurrentScene( str_scene_id );
+        emit sceneCalled( str_scene_id );
 
         // enforce the called scene's light bulb settings
         auto pcl_scene = getCurrentScene();

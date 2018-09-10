@@ -17,6 +17,7 @@ public slots:
 
 protected slots:
     void handleAlarms();
+    void interruptAlarmsOnExternalChange();
 
 protected:
     void loadAlarms();

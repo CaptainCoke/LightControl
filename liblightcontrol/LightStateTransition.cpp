@@ -19,7 +19,8 @@ void LightStateTransition::start()
 
     qInfo() << "starting state transition";
     m_tStart = QDateTime::currentDateTime();
-    m_clConnection = QObject::connect( m_pclLight.get(), &LightBulb::targetStateReached, [this]{ step(); } );
+    m_clStepConnection = QObject::connect( m_pclLight.get(), &LightBulb::targetStateReached, [this]{ step(); } );
+    m_clAbortConnection = QObject::connect( m_pclLight.get(), &Node::stateChanged, [this]{ abortIfPowerOff(); } );
     m_bFinished = false;
     m_eNextAttribute = static_cast<LightAttribute>(NUM_ATTRIBUTES-1);
     m_clNextEventTimer.start();
@@ -27,7 +28,7 @@ void LightStateTransition::start()
 
 void LightStateTransition::abort()
 {
-    qInfo() << m_pclLight->name() << "aborted";
+    qInfo() <<"state transition for" << m_pclLight->name() << "aborted";
     cleanup();
 }
 
@@ -64,10 +65,19 @@ void LightStateTransition::finish()
 void LightStateTransition::cleanup()
 {
     m_clNextEventTimer.stop();
-    QObject::disconnect( m_clConnection );
+    QObject::disconnect( m_clStepConnection );
+    QObject::disconnect( m_clAbortConnection );
     if ( auto it_this = s_mapAllLightStateTransitions.find( m_pclLight->id() ); it_this != s_mapAllLightStateTransitions.end() )
     {
         s_mapAllLightStateTransitions.erase(it_this);
+    }
+}
+
+void LightStateTransition::abortIfPowerOff()
+{
+    if ( !m_pclLight->isOn() ) {
+        qInfo() << m_pclLight->name() << "changed to power off during transition... --> abort";
+        abort();
     }
 }
 

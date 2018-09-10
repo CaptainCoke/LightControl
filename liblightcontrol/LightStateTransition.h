@@ -23,6 +23,7 @@ protected:
     void step();
     void finish();
     void cleanup();
+    void abortIfPowerOff();
 
     void setValueAtPosition( double fAlpha );
 
@@ -39,7 +40,7 @@ private:
     double m_fMinMired = 250, m_fMaxMired = 454;
     double m_fBrightnessStart = 1, m_fBrightnessEnd = 255;
 
-    QMetaObject::Connection m_clConnection;
+    QMetaObject::Connection m_clStepConnection, m_clAbortConnection;
     QTimer m_clNextEventTimer;
 
     static std::map<QString,std::shared_ptr<LightStateTransition>> s_mapAllLightStateTransitions;

@@ -1,6 +1,6 @@
 #include "NodeWidget.h"
 #include <QMessageBox>
-#include "Nodes/Node.h"
+#include <Nodes/Node.h>
 
 NodeWidget::NodeWidget(QWidget *parent)
 : QWidget(parent)

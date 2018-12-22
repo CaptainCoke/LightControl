@@ -3,7 +3,7 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QSpinBox>
-#include "Nodes/CTLightBulb.h"
+#include <Nodes/CTLightBulb.h>
 
 void CTLightBulbWidget::setLightTemperature()
 {

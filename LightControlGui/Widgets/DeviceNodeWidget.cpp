@@ -1,6 +1,6 @@
 #include "DeviceNodeWidget.h"
 #include "ui_DeviceNodeWidget.h"
-#include "Nodes/DeviceNode.h"
+#include <Nodes/DeviceNode.h>
 
 DeviceNodeWidget::DeviceNodeWidget(QWidget *parent)
 : NodeWidget(parent)

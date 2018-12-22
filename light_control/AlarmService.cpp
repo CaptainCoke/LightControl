@@ -3,12 +3,12 @@
 #include <QtDebug>
 #include <QTime>
 #include <set>
-#include "Nodes/LightBulb.h"
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightGroupScene.h"
-#include "NodeTools.h"
-#include "LightBulbState.h"
-#include "LightStateTransition.h"
+#include <Nodes/LightBulb.h>
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightGroupScene.h>
+#include <NodeTools.h>
+#include <LightBulbState.h>
+#include <LightStateTransition.h>
 
 class AlarmService::Alarm
 {

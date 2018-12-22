@@ -1,7 +1,7 @@
 #include "BrightnessButtonHandler.h"
 #include <QtDebug>
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightBulb.h"
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightBulb.h>
 
 BrightnessButtonHandler::BrightnessButtonHandler(int8_t iBrightnessStep)
     : m_iBrightnessStep(iBrightnessStep)

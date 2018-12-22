@@ -1,7 +1,7 @@
 #include "SceneButtonHandler.h"
 #include <QtDebug>
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightGroupScene.h"
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightGroupScene.h>
 
 SceneButtonHandler::SceneButtonHandler(bool bForward)
 : m_bForward(bForward)

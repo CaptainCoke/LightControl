@@ -1,9 +1,9 @@
 #include "LightGroupWidget.h"
 #include <QMessageBox>
 #include "ui_LightGroupWidget.h"
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightBulb.h"
-#include "Nodes/LightGroupScene.h"
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightBulb.h>
+#include <Nodes/LightGroupScene.h>
 
 LightGroupWidget::LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, QWidget *parent)
 : NodeWidget(parent)

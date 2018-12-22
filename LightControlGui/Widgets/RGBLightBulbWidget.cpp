@@ -2,8 +2,8 @@
 #include <QSlider>
 #include <QLabel>
 #include <QBoxLayout>
-#include "Nodes/RGBLightBulb.h"
-#include "LightTemperature.h"
+#include <Nodes/RGBLightBulb.h>
+#include <LightTemperature.h>
 
 void RGBLightBulbWidget::setLightHue()
 {

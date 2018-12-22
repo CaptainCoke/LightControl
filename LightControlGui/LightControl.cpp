@@ -7,10 +7,10 @@
 #include "Widgets/SensorWidget.h"
 #include "Widgets/LightBulbWidget.h"
 #include "Widgets/LightGroupWidget.h"
-#include "Nodes/LightBulb.h"
-#include "Nodes/Sensor.h"
-#include "Nodes/LightGroup.h"
-#include "GatewayAccess.h"
+#include <Nodes/LightBulb.h>
+#include <Nodes/Sensor.h>
+#include <Nodes/LightGroup.h>
+#include <GatewayAccess.h>
 
 LightControl::LightControl(QWidget *parent)
 : QMainWindow(parent)

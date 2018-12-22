@@ -1,7 +1,7 @@
 #include <iostream>
 #include <QCoreApplication>
 #include <QSettings>
-#include "GatewayAccess.h"
+#include <GatewayAccess.h>
 #include "RemoteControlService.h"
 #include "NetworkService.h"
 #include "AlarmService.h"

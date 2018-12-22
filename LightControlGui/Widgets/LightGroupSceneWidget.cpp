@@ -1,12 +1,12 @@
 #include "LightGroupSceneWidget.h"
-#include <Nodes/LightGroupScene.h>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QDoubleSpinBox>
 #include <LightBulbState.h>
+#include <Nodes/LightGroupScene.h>
 #include <Nodes/LightBulb.h>
-#include "LightTemperature.h"
+#include <LightTemperature.h>
 
 LightGroupSceneWidget::LightGroupSceneWidget(QWidget *parent)
 : QGroupBox(parent)

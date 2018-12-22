@@ -2,7 +2,7 @@
 #define REMOTECONTROLSERVICE_H
 
 #include <QObject>
-#include "Nodes/RemoteControl.h"
+#include <Nodes/RemoteControl.h>
 
 class LightGroup;
 class RemoteControlButtonHandler;

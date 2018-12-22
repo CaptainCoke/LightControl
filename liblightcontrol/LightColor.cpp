@@ -1,10 +1,53 @@
 #include "LightColor.h"
 #include <cmath>
 #include <array>
-#include <QColor>
-#include <array>
 #include <tuple>
+#include <algorithm>
 #include "LightTemperature.h"
+
+static std::array<int,3> RGBToHSV( const std::array<double,3>& RGB )
+{
+    auto [it_min, it_max] = std::minmax_element(RGB.begin(),RGB.end());
+    double f_diff = *it_max-*it_min;
+    int h, s, v = static_cast<int>(255 * *it_max);
+    if (f_diff == 0) {
+        // R == G == B
+        h = 0;
+        s = 0;
+    } else {
+        auto i_max_element = std::distance( RGB.begin(), it_max );
+        auto i_next = (i_max_element+1)%3;
+        auto i_next2 = (i_max_element+2)%3;
+        h = static_cast<int>(60*(2*i_max_element + (RGB[i_next]-RGB[i_next2])/f_diff));
+        s = static_cast<int>(255*(f_diff / *it_max));
+    }
+    return {h,s,v};
+}
+
+static std::array<double,3> HSVToRGB( const std::array<int,3>& HSV )
+{
+    double h = static_cast<double>(HSV[0]);
+    double s = static_cast<double>(HSV[1]) / 255.0;
+    double v = static_cast<double>(HSV[2]) / 255.0;
+
+    int h_i = static_cast<int>(std::floor(h/60.0));
+    double f = h_i - h/60.0;
+    
+    double p = v*(1-s);
+    double q = v*(1-s*f);
+    double t = v*(1-s*(1-f));
+
+    switch(h_i) {
+    case 6: [[fallthrough]];
+    case 0: return {v,t,p};
+    case 1: return {q,v,p};
+    case 2: return {p,v,t};
+    case 3: return {p,q,v};
+    case 4: return {t,p,v};
+    case 5: return {v,p,q};
+    default: throw std::runtime_error( "invalid hue value" );
+    }
+}
 
 static std::array<int,3> YxyToHSV(const std::array<double,3>& Yxy)
 {
@@ -34,21 +77,12 @@ static std::array<int,3> YxyToHSV(const std::array<double,3>& Yxy)
     {
         r = g = b = 0;
     }
-
-    QColor cl_color;
-    cl_color.setRgbF( r, g, b );
-    int h, s, v;
-    cl_color.getHsv(&h,&s,&v);
-    return {h,s,v};
+    return RGBToHSV({r,g,b});
 }
 
 static std::array<double,3> HSVToYxy(const std::array<int,3>& HSV)
 {
-    const auto & [h,s,v] = HSV;
-    QColor cl_hsv;
-    cl_hsv.setHsv(h,s,v);
-    double r,g,b;
-    cl_hsv.getRgbF(&r,&g,&b);
+    auto [r,g,b] = HSVToRGB( HSV );
     r = r > 0.04045 ? std::pow( r + 0.055 / (1.0 + 0.055), 2.4 ) : ( r / 12.92 );
     g = g > 0.04045 ? std::pow( g + 0.055 / (1.0 + 0.055), 2.4 ) : ( g / 12.92 );
     b = b > 0.04045 ? std::pow( b + 0.055 / (1.0 + 0.055), 2.4 ) : ( b / 12.92 );

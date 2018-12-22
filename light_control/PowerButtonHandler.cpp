@@ -1,8 +1,8 @@
 #include "PowerButtonHandler.h"
 #include <QtDebug>
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightGroupScene.h"
-#include "Nodes/LightBulb.h"
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightGroupScene.h>
+#include <Nodes/LightBulb.h>
 
 void PowerButtonHandler::workOn(LightGroup& rclGroup)
 {

@@ -1,8 +1,8 @@
 #include "RemoteControlWidget.h"
 #include <QLabel>
-#include "Nodes/RemoteControl.h"
-#include "Nodes/LightGroup.h"
-#include "Nodes/LightBulb.h"
+#include <Nodes/RemoteControl.h>
+#include <Nodes/LightGroup.h>
+#include <Nodes/LightBulb.h>
 
 void RemoteControlWidget::createGui()
 {

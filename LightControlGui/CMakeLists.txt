@@ -21,3 +21,5 @@ target_link_libraries(LightControlGui Qt5::WebSockets)
 target_link_libraries(LightControlGui Qt5::Widgets)
 target_link_libraries(LightControlGui lightcontrol)
 target_include_directories(LightControlGui PUBLIC ${CMAKE_SOURCE_DIR}/liblightcontrol)
+
+install(TARGETS LightControlGui DESTINATION bin)

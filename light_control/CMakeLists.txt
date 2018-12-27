@@ -13,3 +13,5 @@ target_link_libraries(light_control Qt5::Network)
 target_link_libraries(light_control Qt5::WebSockets)
 target_link_libraries(light_control lightcontrol)
 target_include_directories(light_control PUBLIC ${CMAKE_SOURCE_DIR}/liblightcontrol)
+
+install(TARGETS light_control DESTINATION bin)

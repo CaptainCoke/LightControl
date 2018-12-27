@@ -12,9 +12,6 @@ add_subdirectory(liblightcontrol)
 add_subdirectory(light_control)
 add_subdirectory(LightControlGui)
 
-install(TARGETS LightControlGui DESTINATION bin)
-install(TARGETS light_control DESTINATION bin)
-
 if(WIN32)
 	# get reference to deployqt
 	get_target_property(uic_location Qt5::uic IMPORTED_LOCATION)

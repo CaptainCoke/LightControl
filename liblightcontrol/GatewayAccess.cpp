@@ -138,6 +138,11 @@ QString GatewayAccess::getApiRequestFromURL( const QUrl& rclUrl )
     QStringList lst_request_elements = rclUrl.path().split( "/", QString::SkipEmptyParts );
     // remove the "api" and api key elements from the request
     lst_request_elements.pop_front();
-    lst_request_elements.pop_front();
-    return lst_request_elements.join("/");
+    if ( lst_request_elements.empty() ) // handle the case that the api key was initially requested.
+        return "";
+    else
+    {
+        lst_request_elements.pop_front();
+        return lst_request_elements.join("/");
+    }
 }

@@ -8,10 +8,15 @@
 
 const QString LightBulb::node_type{"lights"};
 
-LightBulb::LightBulb(const QString& strId)
-: DeviceNode(strId)
-, m_pclCurrentState( std::make_unique<LightBulbState>() )
+LightBulb::LightBulb()
+: m_pclCurrentState( std::make_unique<LightBulbState>() )
 {
+}
+
+void LightBulb::initializeNode(const QString& strId)
+{
+    DeviceNode::initializeNode(strId);
+
     m_clStateLostGracePeriod.setInterval(250);
     m_clStateLostGracePeriod.setSingleShot(true);
     connect( this, &DeviceNode::changeStateConfirmed, this, &Node::refreshNode );
@@ -129,11 +134,12 @@ std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJs
 {
     std::shared_ptr<LightBulb> pcl_light;
     if ( RGBLightBulb::isRGBLight(rclObject) )
-        pcl_light.reset( new RGBLightBulb(strId) );
+        pcl_light.reset( new RGBLightBulb() );
     else if ( CTLightBulb::isCTLight(rclObject) )
-        pcl_light.reset( new CTLightBulb(strId) );
+        pcl_light.reset( new CTLightBulb() );
     else
-        pcl_light.reset( new LightBulb(strId) );
+        pcl_light.reset( new LightBulb() );
+    pcl_light->initializeNode(strId);
     return pcl_light;
 }
 

@@ -95,7 +95,9 @@ bool LightGroup::allOn() const
 
 std::shared_ptr<LightGroup> LightGroup::createNode(const QString &strId, const QJsonObject &)
 {
-    return std::shared_ptr<LightGroup>( new LightGroup(strId) );
+    auto pcl_node = std::shared_ptr<LightGroup>( new LightGroup );
+    pcl_node->initializeNode( strId );
+    return pcl_node;
 }
 
 const QString& LightGroup::nodeType() const

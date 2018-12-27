@@ -43,7 +43,9 @@ protected slots:
     void onFalseState();
 
 protected:
-    LightBulb(const QString& strId);
+    LightBulb();
+
+    void initializeNode(const QString& strId) override;
 
     void putStateOnLightBulb( const LightBulbState& rclState, float fTransitionTimeSeconds = 0.f);
     bool setStateData(const QJsonObject &rclObject);

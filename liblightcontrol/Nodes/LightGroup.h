@@ -40,7 +40,8 @@ protected slots:
     void lightChanged();
 
 protected:
-    using Node::Node;
+    LightGroup() = default;
+
     bool setStateData(const QJsonObject &rclObject);
     bool setLights(const QJsonArray& rclArray);
     bool setScenes(const QJsonArray& rclArray);

@@ -2,9 +2,10 @@
 #include <QJsonObject>
 #include "GatewayAccess.h"
 
-Node::Node(const QString& strId)
-: m_strId(strId)
+
+void Node::initializeNode(const QString& strId)
 {
+    m_strId = strId;
     m_clStatePollingTimer.setInterval( 100 );
     connect( &m_clStatePollingTimer, &QTimer::timeout, this, &Node::refreshNode );
 }

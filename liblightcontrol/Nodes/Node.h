@@ -30,7 +30,9 @@ public slots:
     void deleteNode();
 
 protected:
-    Node(const QString& strId);
+    Node() = default; // constructor is default. All initialization work is done by "initializeNode".
+
+    virtual void initializeNode(const QString& strId);
     void refreshPeriodically(uint32_t uiMilliseconds);
 
 private:

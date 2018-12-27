@@ -20,7 +20,8 @@ public:
     const QString& nodeType() const override;
 
 protected:
-    using DeviceNode::DeviceNode;
+    Sensor() = default;
+
     virtual bool setConfigData(const QJsonObject &rclObject);
     virtual bool setStateData(const QJsonObject &rclObject);
 

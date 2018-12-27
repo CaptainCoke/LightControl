@@ -20,7 +20,7 @@ signals:
     void changeStateConfirmed();
 
 protected:
-    using Node::Node;
+    DeviceNode() = default;
 
     bool setReachable( bool bReachable );
     void changeState( QJsonObject clObject, float fTransitionTimeS = 0.f );

@@ -34,9 +34,10 @@ std::shared_ptr<Sensor> Sensor::createNode(const QString& strId, const QJsonObje
 {
     std::shared_ptr<Sensor> pcl_sensor;
     if ( RemoteControl::isRemoteControl(rclObject) )
-        pcl_sensor.reset( new RemoteControl(strId) );
+        pcl_sensor.reset( new RemoteControl() );
     else
-        pcl_sensor.reset( new Sensor(strId) );
+        pcl_sensor.reset( new Sensor() );
+    pcl_sensor->initializeNode(strId);
     return pcl_sensor;
 }
 

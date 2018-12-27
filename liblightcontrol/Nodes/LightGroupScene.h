@@ -23,6 +23,8 @@ public:
 
     bool isActive();
 
+    void swapIdWith( LightGroupScene& rclOther );
+
 public slots:
     void setTransitionTime( double fTransitionTimeS );
     void notifyLightsOfActivation();

@@ -71,12 +71,15 @@ void LightGroupScene::apply()
 
 void LightGroupScene::save()
 {
+    // save entries of scene
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
         QJsonObject cl_object = rcl_state.toJson(true);
         cl_object.insert( "transitiontime", QJsonValue( static_cast<double>(m_fTransitionTimeS*10.f) ) );
         GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
     }
+    // save name of scene
+    GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id(), QJsonDocument(QJsonObject( {{"name",m_strName}} )).toJson(), [](const QJsonArray&){});
 }
 
 void LightGroupScene::pickSettings(const QString &strLightId)
@@ -112,3 +115,9 @@ void LightGroupScene::setSceneData(const QJsonObject &rclObject)
         emit sceneApplied();
 }
 
+void LightGroupScene::swapIdWith( LightGroupScene& rclOther )
+{
+    m_strId.swap(rclOther.m_strId);
+    save();
+    rclOther.save();
+}

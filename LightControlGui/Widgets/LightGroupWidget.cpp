@@ -17,6 +17,7 @@ LightGroupWidget::LightGroupWidget(const std::shared_ptr<LightGroup>& pclGroup, 
     connect( m_pclUI->listScenes, &QListWidget::currentItemChanged, this, &LightGroupWidget::showSceneInfo );
     connect( m_pclUI->buttonPreviousScene, &QPushButton::clicked, pclGroup.get(), &LightGroup::setPreviousScene );
     connect( m_pclUI->buttonNextScene, &QPushButton::clicked, pclGroup.get(), &LightGroup::setNextScene );
+    connect( m_pclUI->buttonMoveSceneDown, &QPushButton::clicked, this, &LightGroupWidget::swapSceneWithBelow );
 }
 
 LightGroupWidget::~LightGroupWidget() = default;
@@ -63,6 +64,27 @@ void LightGroupWidget::updateState()
         m_pclUI->listScenes->addItem( pcl_item );
     }
     m_pclUI->listScenes->setCurrentRow(i_selected_scene);
+}
+
+void LightGroupWidget::swapSceneWithBelow()
+{
+    auto pcl_item = m_pclUI->listScenes->currentItem();
+    if ( pcl_item == nullptr )
+        return;
+
+    auto pcl_group = getNode<LightGroup>();
+    const auto & map_scenes = pcl_group->scenes();
+    auto it_scene = map_scenes.find(pcl_item->data(Qt::UserRole).toString());
+    if ( it_scene == map_scenes.end() )
+        return;
+
+    auto it_next = it_scene;
+    it_next++;
+
+    if ( it_next == map_scenes.end() )
+        return;
+
+    it_scene->second->swapIdWith( *it_next->second );
 }
 
 void LightGroupWidget::setLightOnState(int iState)

@@ -22,6 +22,7 @@ public:
 public slots:
     void deleteNode() override;
     void updateState() override;
+    void swapSceneWithBelow();
 
 protected slots:
     void setLightOnState( int iState );

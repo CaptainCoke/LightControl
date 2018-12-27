@@ -122,9 +122,15 @@ std::shared_ptr<LightGroupScene> LightGroup::getCurrentScene() const
 std::shared_ptr<LightGroupScene> LightGroup::getNextScene() const
 {
     auto it_scene = m_mapScenes.find( m_strCurrentScene );
-    it_scene++;
-    if ( it_scene == m_mapScenes.end() && !m_mapScenes.empty() ) // wrap aound
+    
+    // increment (if possible)
+    if ( it_scene != m_mapScenes.end() )
+        it_scene++;
+
+    // wrap around (or start at beginning if not found in first place)
+    if ( it_scene == m_mapScenes.end() && !m_mapScenes.empty() )
         it_scene = m_mapScenes.begin();
+
     if ( it_scene != m_mapScenes.end() )
         return it_scene->second;
     else
@@ -134,9 +140,15 @@ std::shared_ptr<LightGroupScene> LightGroup::getNextScene() const
 std::shared_ptr<LightGroupScene> LightGroup::getPreviousScene() const
 {
     auto it_scene = std::find_if( m_mapScenes.rbegin(), m_mapScenes.rend(), [this](const auto & rcl_entry){ return rcl_entry.first == m_strCurrentScene; } );
-    it_scene++;
-    if ( it_scene == m_mapScenes.rend() && !m_mapScenes.empty() ) // wrap aound
+
+    // increment (if possible)
+    if ( it_scene != m_mapScenes.rend() )
+        it_scene++;
+    
+    // wrap around (or start at beginning if not found in first place)
+    if ( it_scene == m_mapScenes.rend() && !m_mapScenes.empty() )
         it_scene = m_mapScenes.rbegin();
+
     if ( it_scene != m_mapScenes.rend() )
         return it_scene->second;
     else

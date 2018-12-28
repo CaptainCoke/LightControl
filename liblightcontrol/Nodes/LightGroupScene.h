@@ -29,6 +29,7 @@ public slots:
     void setTransitionTime( double fTransitionTimeS );
     void notifyLightsOfActivation();
     void apply();
+    void storeCurrentGroupState();
     void save();
     void refreshSettings();
     void pickSettings( const QString& strLightId );

@@ -69,6 +69,13 @@ void LightGroupScene::apply()
     });
 }
 
+void LightGroupScene::storeCurrentGroupState()
+{
+    GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/store", {}, [this](const QJsonArray&){
+        refreshSettings();
+    });
+}
+
 void LightGroupScene::save()
 {
     // save entries of scene

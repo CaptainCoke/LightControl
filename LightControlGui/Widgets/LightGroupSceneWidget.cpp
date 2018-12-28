@@ -25,6 +25,12 @@ void LightGroupSceneWidget::setScene(std::shared_ptr<LightGroupScene> pclScene)
     QGridLayout* pcl_layout = dynamic_cast<QGridLayout*>(layout());
 
     int i_row = 0;
+
+    QPushButton* pcl_store_btn = new QPushButton("group state -> scene");
+    connect( pcl_store_btn, &QPushButton::clicked, pclScene.get(), &LightGroupScene::storeCurrentGroupState );
+    pcl_layout->addWidget( pcl_store_btn, i_row, 0, 1, 2 );
+    i_row++;
+
     for ( const auto &[str_id, rcl_state] : pclScene->getStates() )
     {
         auto pcl_pick_button = new QPushButton("pick");

@@ -1,10 +1,10 @@
 #ifndef CTLIGHTBULB_H
 #define CTLIGHTBULB_H
 
-#include "LightBulb.h"
+#include "DimmableLightBulb.h"
 #include "LightTemperature.h"
 
-class CTLightBulb : public LightBulb
+class CTLightBulb : public DimmableLightBulb
 {
 public:
     ~CTLightBulb() override = default;
@@ -22,7 +22,7 @@ public slots:
     void setMired( uint16_t uiMired, float fTransitionTimeS = 0.f );
 
 protected:
-    using LightBulb::LightBulb;
+    using DimmableLightBulb::DimmableLightBulb;
     bool isCloseEnoughToTargetState() const override;
 
 private:

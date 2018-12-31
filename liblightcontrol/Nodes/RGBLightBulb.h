@@ -1,10 +1,10 @@
 #ifndef RGBLIGHTBULB_H
 #define RGBLIGHTBULB_H
 
-#include "LightBulb.h"
+#include "DimmableLightBulb.h"
 #include "LightColor.h"
 
-class RGBLightBulb : public LightBulb
+class RGBLightBulb : public DimmableLightBulb
 {
     Q_OBJECT
 public:
@@ -24,7 +24,7 @@ public slots:
     void setSaturation( uint8_t uiSaturation, float fTransitionTimeS = 0.f );
 
 protected:
-    using LightBulb::LightBulb;
+    using DimmableLightBulb::DimmableLightBulb;
 };
 
 #endif // RGBLIGHTBULB_H

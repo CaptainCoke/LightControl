@@ -4,6 +4,7 @@
 #include <QtDebug>
 #include "RGBLightBulb.h"
 #include "CTLightBulb.h"
+#include "DimmableLightBulb.h"
 #include "LightBulbState.h"
 
 const QString LightBulb::node_type{"lights"};
@@ -33,14 +34,6 @@ bool LightBulb::isOn() const
         return getCurrentState().on();
     else
         return false;
-}
-
-uint8_t LightBulb::brightness() const
-{
-    if ( getCurrentState().hasBrightness() )
-        return getCurrentState().brightness();
-    else
-        return 0;
 }
 
 void LightBulb::setNodeData(const QJsonObject &rclObject)
@@ -137,6 +130,8 @@ std::shared_ptr<LightBulb> LightBulb::createNode(const QString& strId, const QJs
         pcl_light.reset( new RGBLightBulb() );
     else if ( CTLightBulb::isCTLight(rclObject) )
         pcl_light.reset( new CTLightBulb() );
+    else if ( DimmableLightBulb::isDimmableLight(rclObject) )
+        pcl_light.reset( new DimmableLightBulb );
     else
         pcl_light.reset( new LightBulb() );
     pcl_light->initializeNode(strId);
@@ -181,12 +176,6 @@ bool LightBulb::isInTargetState() const
 void LightBulb::setOn( bool bOn, float fTransitionTimeS )
 {
     setTargetState( LightBulbState( getTargetState() ).setOn(bOn), fTransitionTimeS );
-    changeToTargetStateIfNecessary();
-}
-
-void LightBulb::setBrightness(uint8_t uiBrightness, float fTransitionTimeS )
-{
-    setTargetState( LightBulbState( getTargetState() ).setBrightness(uiBrightness), fTransitionTimeS );
     changeToTargetStateIfNecessary();
 }
 

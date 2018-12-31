@@ -16,7 +16,6 @@ public:
     static const QString node_type;
 
     bool isOn() const;
-    uint8_t brightness() const;
 
     void setNodeData(const QJsonObject &rclObject) override;
     virtual void handlePushUpdate(const QJsonObject &rclObject);
@@ -34,7 +33,6 @@ signals:
 
 public slots:
     void setOn( bool bOn, float fTransitionTimeS = 0.f );
-    void setBrightness( uint8_t uiBrightness, float fTransitionTimeS = 0.f );
     void setTargetState( const LightBulbState& rclState, const QDateTime& rclWhen );
     void setTargetState( const LightBulbState& rclState, float fSecondsInTheFuture );
     void changeToTargetStateIfNecessary();

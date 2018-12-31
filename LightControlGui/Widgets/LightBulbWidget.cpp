@@ -50,8 +50,14 @@ void LightBulbWidget::updateState()
 {
     DeviceNodeWidget::updateState();
     auto pcl_light = getNode<LightBulb>();
-    m_pclOnCheck->setChecked(        pcl_light->isOn() );
-    m_pclBrightnessSlider->setValue( pcl_light->brightness() );
+    m_pclOnCheck->setChecked( pcl_light->isOn() );
+    auto pcl_dimmable_light = getNode<DimmableLightBulb>();
+    if ( pcl_dimmable_light ) {
+        m_pclBrightnessSlider->setValue( pcl_dimmable_light->brightness() );
+        m_pclBrightnessSlider->show();
+    } else
+        m_pclBrightnessSlider->hide();
+
     if ( pcl_light->isInTargetState() )
         setToTargetStateReached();
     else
@@ -78,7 +84,7 @@ void LightBulbWidget::setToTargetStateChanging()
 
 void LightBulbWidget::setLightBrightness()
 {
-    auto pcl_light = getNode<LightBulb>();
+    auto pcl_light = getNode<DimmableLightBulb>();
     if ( pcl_light )
         pcl_light->setBrightness( static_cast<uint8_t>(m_pclBrightnessSlider->value()) );
 }

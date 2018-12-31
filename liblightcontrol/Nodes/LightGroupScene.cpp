@@ -82,6 +82,8 @@ void LightGroupScene::save()
     for ( const auto &[str_light, rcl_state] : m_mapLightStates )
     {
         QJsonObject cl_object = rcl_state.toJson(true);
+        if ( !rcl_state.hasBrightness() )
+            cl_object.insert( "bri", QJsonValue( 0 ) ); // non-dimmable lights (without brightness) will be treated wrongly if the brightness is not set to 0 explicitly
         cl_object.insert( "transitiontime", QJsonValue( static_cast<double>(m_fTransitionTimeS*10.f) ) );
         GatewayAccess::instance().put(LightGroup::node_type+"/"+m_strGroupId+"/scenes/"+id()+"/lights/"+str_light+"/state",QJsonDocument(cl_object).toJson(), [](const QJsonArray&){});
     }

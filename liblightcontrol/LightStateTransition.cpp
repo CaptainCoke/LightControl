@@ -98,10 +98,10 @@ void LightStateTransition::setValueAtPosition( double fAlpha )
     case Brightness:
     {
         uint8_t brightness_step = static_cast<uint8_t>(std::clamp(m_fBrightnessStart*(1.0-fAlpha) + m_fBrightnessEnd*fAlpha, 1.0, 255.0));
-        if ( m_pclLight->brightness() != brightness_step)
+        if ( auto pcl_dimmable_light = std::dynamic_pointer_cast<DimmableLightBulb>( m_pclLight ); pcl_dimmable_light && pcl_dimmable_light->brightness() != brightness_step )
         {
             qInfo() << m_pclLight->name() << fAlpha*100 << "%  --> brightness:" << brightness_step;
-            m_pclLight->setBrightness( brightness_step );
+            pcl_dimmable_light->setBrightness( brightness_step );
             break;
         }
         [[fallthrough]];

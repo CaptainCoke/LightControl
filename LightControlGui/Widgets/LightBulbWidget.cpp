@@ -3,6 +3,7 @@
 #include <QLabel>
 #include <QBoxLayout>
 #include <QCheckBox>
+#include <QTimer>
 #include <Nodes/RGBLightBulb.h>
 #include <Nodes/CTLightBulb.h>
 #include "RGBLightBulbWidget.h"
@@ -30,7 +31,13 @@ void LightBulbWidget::createGui()
 
     m_pclOnCheck = new QCheckBox("On", this);
     connect( m_pclOnCheck, &QCheckBox::toggled, this, &LightBulbWidget::setOn );
-    addControl( "", m_pclOnCheck );
+    m_pclLastPoweredLabel = new QLabel("");
+    QBoxLayout* pcl_power_layout = new QHBoxLayout;
+    pcl_power_layout->addWidget(m_pclOnCheck);
+    pcl_power_layout->addWidget( new QLabel("Last powered: ") );
+    pcl_power_layout->addWidget(m_pclLastPoweredLabel);
+    addControl( "", pcl_power_layout );
+    setLastPoweredText( QDateTime() );
 
     m_pclBrightnessSlider = new QSlider(Qt::Horizontal,this);
     m_pclBrightnessSlider->setRange( 0, 255 );
@@ -44,6 +51,28 @@ void LightBulbWidget::createGui()
     connect( m_pclBrightnessSlider, &QAbstractSlider::sliderReleased, this, &LightBulbWidget::setLightBrightness );
 
     addControl( "Brightness", pcl_brightness_layout );
+
+    QTimer* pcl_refresh_last_powered_timer = new QTimer(this);
+    pcl_refresh_last_powered_timer->setInterval(2000);
+    pcl_refresh_last_powered_timer->setSingleShot(false);
+    connect( pcl_refresh_last_powered_timer, &QTimer::timeout, this, &LightBulbWidget::updateLastPoweredText );
+    pcl_refresh_last_powered_timer->start();
+}
+
+void LightBulbWidget::updateLastPoweredText()
+{
+    if ( auto pcl_light = getNode<LightBulb>() )
+        setLastPoweredText( pcl_light->lastTimepointSeenPowered() );
+    else
+        setLastPoweredText( QDateTime() );
+}
+
+void LightBulbWidget::setLastPoweredText( const QDateTime& tLastPowered )
+{
+    if ( !tLastPowered.isValid() )
+        m_pclLastPoweredLabel->setText( "never" );
+    else
+        m_pclLastPoweredLabel->setText( QString("%1s ago").arg( tLastPowered.secsTo( QDateTime::currentDateTime() ) ) );
 }
 
 void LightBulbWidget::updateState()
@@ -51,6 +80,8 @@ void LightBulbWidget::updateState()
     DeviceNodeWidget::updateState();
     auto pcl_light = getNode<LightBulb>();
     m_pclOnCheck->setChecked( pcl_light->isOn() );
+    setLastPoweredText( pcl_light->lastTimepointSeenPowered() );
+
     auto pcl_dimmable_light = getNode<DimmableLightBulb>();
     if ( pcl_dimmable_light ) {
         m_pclBrightnessSlider->setValue( pcl_dimmable_light->brightness() );

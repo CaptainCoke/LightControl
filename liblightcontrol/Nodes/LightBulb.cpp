@@ -36,11 +36,21 @@ bool LightBulb::isOn() const
         return false;
 }
 
+QDateTime LightBulb::lastTimepointSeenPowered() const
+{
+    if ( getCurrentState().hasOn() && getCurrentState().on() )
+        return QDateTime::currentDateTime();
+    else
+        return m_clLastPoweredTimepoint;
+}
+
 void LightBulb::setNodeData(const QJsonObject &rclObject)
 {
     DeviceNode::setNodeData( rclObject );
     if ( setStateData( rclObject.value("state").toObject() ) )
         emit stateChanged();
+
+    updateLastPoweredTimepoint();
 
     if ( !m_bIsInTargetState )
     {
@@ -79,6 +89,8 @@ void LightBulb::handlePushUpdate(const QJsonObject &rclObject)
 
     bool b_changed = cl_new_state != getCurrentState();
 
+    updateLastPoweredTimepoint();
+
     LightBulbState cl_change = cl_new_state - getCurrentState();
     if ( b_changed )
     {
@@ -89,6 +101,7 @@ void LightBulb::handlePushUpdate(const QJsonObject &rclObject)
     else
         qDebug() << name() << "External push" << rclObject.value("state").toObject() << ", but state remains same ("<< getCurrentState() <<")";
 
+    updateLastPoweredTimepoint();
     reactOnTargetState();
 }
 
@@ -115,6 +128,12 @@ void LightBulb::reactOnTargetState()
         m_bIsInTargetState = false;
         emit targetStateLost();
     }
+}
+
+void LightBulb::updateLastPoweredTimepoint()
+{
+    if ( getCurrentState().hasOn() && getCurrentState().on() )
+        m_clLastPoweredTimepoint = QDateTime::currentDateTime();
 }
 
 bool LightBulb::isCloseEnoughToTargetState() const

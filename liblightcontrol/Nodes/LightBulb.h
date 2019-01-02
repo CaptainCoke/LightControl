@@ -16,6 +16,7 @@ public:
     static const QString node_type;
 
     bool isOn() const;
+    QDateTime lastTimepointSeenPowered() const;
 
     void setNodeData(const QJsonObject &rclObject) override;
     virtual void handlePushUpdate(const QJsonObject &rclObject);
@@ -54,11 +55,13 @@ protected:
     LightBulbState& getCurrentState();
 
     void reactOnTargetState();
+    void updateLastPoweredTimepoint();
     virtual bool isCloseEnoughToTargetState() const;
 
 private:
     std::unique_ptr<LightBulbState> m_pclCurrentState, m_pclTargetState;
     QDateTime m_clTargetStateTimepoint; //< the timepoint when on the target state is supposed to be reached
+    QDateTime m_clLastPoweredTimepoint; //< the timepoint when the LightBulb was last seen "powered"
     bool m_bIsInTargetState = false;
     QTimer m_clStateLostGracePeriod;
 };

@@ -18,6 +18,7 @@ public:
 protected slots:
     void setLightBrightness();
     void setOn(bool bOn);
+    void updateLastPoweredText();
 
 protected:
     void createGui() override;
@@ -26,12 +27,15 @@ protected:
     void setToTargetStateLost();
     void setToTargetStateChanging();
 
+    void setLastPoweredText( const QDateTime& tLastPowered );
+
 private:
     explicit LightBulbWidget( const std::shared_ptr<LightBulb>& pclLight, QWidget *parent = nullptr );
 
     QCheckBox *m_pclOnCheck;
     QSlider   *m_pclBrightnessSlider;
     QLabel    *m_pclStateReachedLabel;
+    QLabel    *m_pclLastPoweredLabel;
 };
 
 #endif // LIGHTBULBWIDGET_H

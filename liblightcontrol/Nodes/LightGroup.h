@@ -51,11 +51,14 @@ protected:
     friend class NodeFactory<LightGroup>;
     static std::shared_ptr<LightGroup> createNode(const QString& strId, const QJsonObject &rclObject);
 
+    bool isCurrentSceneOutdated() const;
+
 private:
     QStringList m_lstLightIds;
     bool        m_bAllOn;
     bool        m_bAnyOn;
     QString     m_strCurrentScene;
+    size_t      m_uiSecondsCurrentSceneRemainsValid = 30;
 
     std::map<QString,std::shared_ptr<LightGroupScene>> m_mapScenes;
 };

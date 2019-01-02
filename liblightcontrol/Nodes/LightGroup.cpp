@@ -64,7 +64,7 @@ void LightGroup::handlePushUpdate(const QJsonObject &rclObject)
 bool LightGroup::anyOn() const
 {
     for ( const auto& pcl_light : lights() )
-        if ( pcl_light->isOn() )
+        if ( pcl_light->isReachable() && pcl_light->isOn() )
             return true;
     return false;
 }
@@ -110,11 +110,31 @@ bool LightGroup::isEmpty() const
     return m_mapScenes.empty() && m_lstLightIds.empty();
 }
 
+bool LightGroup::isCurrentSceneOutdated() const
+{
+    // get the shortest amount of seconds any of the lights was off so far
+    for ( const auto& pcl_light : lights() )
+    {
+        auto t_powered = pcl_light->lastTimepointSeenPowered();
+        if ( t_powered.isValid() )
+        {
+            auto i_seconds_off = t_powered.secsTo( QDateTime::currentDateTime() );
+            if ( i_seconds_off <= m_uiSecondsCurrentSceneRemainsValid )
+                return false;
+        }        
+    }
+    return true;
+}
+
 std::shared_ptr<LightGroupScene> LightGroup::getCurrentScene() const
 {
     auto it_scene = m_mapScenes.find( m_strCurrentScene );
     if ( it_scene != m_mapScenes.end() )
+    {
+        if ( isCurrentSceneOutdated() )
+            return nullptr;
         return it_scene->second;
+    }
     else
         return nullptr;
 }

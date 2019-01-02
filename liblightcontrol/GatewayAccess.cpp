@@ -112,13 +112,29 @@ bool GatewayAccess::networkReplySuccessful( QNetworkReply* pclReply )
         switch ( i_status )
         {
         case 200: // 200 OK
-            //emit networkInfo( QString("Server succeeded with request %1").arg(str_original_request) );
+        case 201: // 201 CREATED
             return true;
+        case 202: // 202 ACCEPTED
+            return false;
         case 304: // 304 NOT MODIFIED
-            //emit networkInfo( QString("Server indicated no modification for request %1").arg(str_original_request) );
+            return false;
+        case 400: // 400 BAD REQUEST
+            emit gatewayError( QString("400 BAD REQUEST: the request was not formatted as expected or missing paramters") );
+            return false;
+        case 401: // 401 UNAUTHORIZED
+            emit gatewayError( QString("401 UNAUTHORIZED") );
+            return false;
+        case 403: // 403 FORBIDDEN
+            emit gatewayError( QString("403 FORBIDDEN") );
+            return false;
+        case 404: // 404 NOT FOUND
+            emit gatewayError( QString("404 NOT FOUND") );
+            return false;
+        case 503: // 503 SERVICE UNAVAILABLE
+            emit gatewayError( QString("503 SERVICE UNAVAILABLE: The device is not connected to the network or too busy to handle further requests") );
             return false;
         default:
-            emit networkInfo( QString("Server responded with status code %1 for request %2").arg(i_status).arg(str_original_request) );
+            emit gatewayError( QString("Server responded with status code %1 for request %2").arg(i_status).arg(str_original_request) );
             return false;
         }
     case QNetworkReply::OperationCanceledError:

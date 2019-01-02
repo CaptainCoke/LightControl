@@ -18,6 +18,9 @@ NetworkService::NetworkService(QObject *parent)
     connect( &GatewayAccess::instance(), &GatewayAccess::networkError, [this](const QString& strMessage){
         qCritical() << "Network error:" << strMessage;
     } );
+    connect( &GatewayAccess::instance(), &GatewayAccess::gatewayError, [this](const QString& strMessage){
+        qCritical() << "Gateway error:" << strMessage;
+    } );
 
     connect( &GatewayAccess::instance(), &GatewayAccess::connectionRefused, [this]{
         static size_t ui_retry_count = 0;
